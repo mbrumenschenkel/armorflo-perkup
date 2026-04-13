@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: false }));
 // ── Serve frontend HTML files ────────────────────────────────
 // receipt-approval.html  →  https://your-server.com/
 // admin.html             →  https://your-server.com/admin
-const frontendPath = path.join(__dirname, '../frontend');
+const frontendPath = path.join(__dirname, 'frontend');
 app.use(express.static(frontendPath));
 app.get('/', (req, res) => res.sendFile(path.join(frontendPath, 'receipt-approval.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(frontendPath, 'admin.html')));
