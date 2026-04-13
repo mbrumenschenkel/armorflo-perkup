@@ -12,24 +12,13 @@ app.use(express.urlencoded({ extended: false }));
 // ── Serve frontend HTML files ────────────────────────────────
 // receipt-approval.html  →  https://your-server.com/
 // admin.html             →  https://your-server.com/admin
-app.use(express.static(path.join(__dirname, '../frontend')));
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../frontend/receipt-approval.html')));
-app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, '../frontend/admin.html')));
-
-// ── API Routes ───────────────────────────────────────────────
-app.use('/sms', smsRoutes);         // Twilio webhook endpoint
-app.use('/api/admin', adminRoutes); // REST API for admin.html and receipt-approval.html
-
-app.use('/api/claim', claimRoutes);
-app.get('/claim', (req, res) =>
-  res.sendFile(path.join(__dirname, '../frontend/claim.html')));
-
-// Health check
-app.get('/privacy-policy', (req, res) =>
-  res.sendFile(path.join(__dirname, '../frontend/privacy-policy.html')));
-
-app.get('/terms-and-conditions', (req, res) =>
-  res.sendFile(path.join(__dirname, '../frontend/terms-and-conditions.html')));
+const frontendPath = path.join(__dirname, '../frontend');
+app.use(express.static(frontendPath));
+app.get('/', (req, res) => res.sendFile(path.join(frontendPath, 'receipt-approval.html')));
+app.get('/admin', (req, res) => res.sendFile(path.join(frontendPath, 'admin.html')));
+app.get('/claim', (req, res) => res.sendFile(path.join(frontendPath, 'claim.html')));
+app.get('/privacy-policy', (req, res) => res.sendFile(path.join(frontendPath, 'privacy-policy.html')));
+app.get('/terms-and-conditions', (req, res) => res.sendFile(path.join(frontendPath, 'terms-and-conditions.html')));
 
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'ArmorFlo Perk Up' }));
 
