@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArmorFlo — Perk Up Rewards</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #0F2C47;
+  --navy-mid: #1a3d5c;
+  --navy-light: #1e4a6e;
+  --gold: #D68F37;
+  --gold-dark: #b87720;
+  --silver: #999999;
+  --armor-grey: #EEEEEE;
+  --white: #FFFFFF;
+  --black: #000000;
+  --success: #2d6a2d;
+  --success-bg: #e8f5e8;
+  --error: #8B1A1A;
+  --error-bg: #fdf0f0;
+  --warn-bg: #fff8ec;
+  --warn: #8B5500;
+  --border: rgba(15,44,71,0.12);
+  --radius: 6px;
+  --radius-lg: 10px;
+}
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--armor-grey);
+  color: var(--navy);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--navy);
+  padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 68px; position: sticky; top: 0; z-index: 100;
+}
+.logo-area { display: flex; align-items: center; gap: 10px; }
+.shield-logo {
+  width: 36px; height: 36px;
+}
+.logo-wordmark {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: 1.5rem; letter-spacing: 0.04em;
+  color: var(--white); text-transform: uppercase;
+}
+.logo-wordmark span { color: var(--gold); }
+nav { display: flex; gap: 1.5rem; }
+nav a {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600; font-size: 0.85rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(255,255,255,0.65);
+  text-decoration: none; transition: color 0.2s;
+}
+nav a:hover { color: var(--white); }
+nav a.active { color: var(--gold); }
+
+/* ── HERO ── */
+.hero {
+  background: var(--navy);
+  padding: 3.5rem 2rem 3rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+/* Background swoosh */
+.hero::before {
+  content: '';
+  position: absolute;
+  right: -120px; top: -60px;
+  width: 420px; height: 420px;
+  border-radius: 50%;
+  border: 60px solid rgba(255,255,255,0.04);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -60px; top: 20px;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  border: 40px solid rgba(255,255,255,0.03);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(214,143,55,0.15);
+  border: 1px solid rgba(214,143,55,0.35);
+  color: var(--gold);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 0.75rem; letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 5px 14px; border-radius: 2px;
+  margin-bottom: 1.25rem;
+}
+.hero h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: clamp(2.5rem, 6vw, 4.5rem);
+  letter-spacing: 0.02em; line-height: 0.95; margin-bottom: 0.5rem;
+  color: var(--white); text-transform: uppercase;
+}
+.hero h1 span { color: var(--gold); }
+.tagline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 1rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.5);
+  margin-bottom: 2rem;
+}
+
+/* ── STEP BAR ── */
+.steps-bar {
+  display: flex; justify-content: center; align-items: center;
+  gap: 0; flex-wrap: wrap; padding: 0 1rem;
+}
+.step {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 14px; font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 0.75rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(255,255,255,0.35);
+}
+.step-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.4);
+  flex-shrink: 0; transition: all 0.3s;
+}
+.step.done .step-num { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+.step.active .step-num { background: var(--white); border-color: var(--white); color: var(--navy); }
+.step.active { color: var(--white); }
+.step.done { color: rgba(255,255,255,0.6); }
+.step-div { width: 28px; height: 1px; background: rgba(255,255,255,0.15); }
+
+/* ── CHEVRONS decorative ── */
+.chevrons {
+  display: flex; justify-content: center; gap: 4px; margin-top: 1.5rem; opacity: 0.25;
+}
+.chev { width: 0; height: 0; border-top: 9px solid transparent; border-bottom: 9px solid transparent; border-left: 10px solid var(--gold); }
+
+/* ── MAIN ── */
+main { max-width: 820px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+/* ── BRACKET CARD ── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  position: relative;
+}
+/* Bracket corners */
+.card-bracketed::before, .card-bracketed::after {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  border-color: var(--gold);
+  border-style: solid;
+}
+.card-bracketed::before { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+.card-bracketed::after { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+
+.card-header {
+  background: var(--navy);
+  padding: 1rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.card-header-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800; font-size: 1rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--white);
+}
+.card-header-title span { color: var(--gold); }
+.card-body { padding: 1.5rem; }
+
+/* ── UPLOAD ZONE ── */
+.upload-zone {
+  padding: 2.5rem 2rem;
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  cursor: pointer; transition: background 0.2s;
+  border: 2px dashed transparent; border-radius: var(--radius);
+}
+.upload-zone:hover, .upload-zone.dragging {
+  background: rgba(214,143,55,0.06);
+  border-color: var(--gold);
+}
+.upload-icon-wrap {
+  width: 64px; height: 64px; border-radius: var(--radius);
+  background: var(--armor-grey);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.upload-zone:hover .upload-icon-wrap { background: rgba(214,143,55,0.15); }
+.upload-icon-wrap svg { width: 28px; height: 28px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+.upload-zone h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--navy);
+}
+.upload-zone p { font-size: 13px; color: var(--silver); text-align: center; line-height: 1.5; }
+.upload-btn {
+  background: var(--navy); color: var(--white);
+  border: none; padding: 10px 24px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 0.85rem; letter-spacing: 0.1em;
+  text-transform: uppercase; cursor: pointer; border-radius: var(--radius);
+  transition: background 0.2s;
+}
+.upload-btn:hover { background: var(--gold); color: var(--navy); }
+#file-input { display: none; }
+
+/* ── PREVIEW ── */
+.preview-wrap {
+  display: none; padding: 1.25rem 1.5rem;
+  gap: 1.25rem; align-items: flex-start;
+  border-top: 1px solid var(--armor-grey);
+}
+.preview-wrap.visible { display: flex; }
+.preview-img-wrap {
+  width: 130px; height: 130px; border-radius: var(--radius);
+  overflow: hidden; border: 1px solid var(--border);
+  flex-shrink: 0; background: var(--armor-grey);
+}
+.preview-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.preview-info { flex: 1; }
+.preview-filename { font-weight: 600; font-size: 14px; margin-bottom: 3px; word-break: break-all; color: var(--navy); }
+.preview-size { font-size: 12px; color: var(--silver); margin-bottom: 0.75rem; }
+.eligibility-box {
+  background: var(--armor-grey); border-radius: var(--radius);
+  padding: 10px 12px; font-size: 12px; color: var(--silver); margin-bottom: 0.75rem;
+}
+.eligibility-box strong {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--navy); display: block; margin-bottom: 6px;
+}
+.product-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.product-chip {
+  font-size: 11px; font-weight: 600; padding: 3px 9px;
+  background: var(--navy); color: var(--white);
+  border-radius: 2px;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.remove-btn {
+  font-size: 11px; font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--error); background: none; border: none; cursor: pointer; padding: 0;
+  text-decoration: underline;
+}
+
+/* ── FORM ── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 1rem; }
+.field:last-child { margin-bottom: 0; }
+label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--navy);
+}
+input[type="text"], input[type="email"], input[type="tel"], input[type="date"], select {
+  width: 100%; padding: 10px 12px;
+  border: 1.5px solid var(--armor-grey);
+  border-radius: var(--radius);
+  font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--navy);
+  background: var(--armor-grey); outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  -webkit-appearance: none;
+}
+input:focus, select:focus {
+  border-color: var(--gold); background: var(--white);
+  box-shadow: 0 0 0 3px rgba(214,143,55,0.12);
+}
+
+/* ── SUBMIT ── */
+.submit-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+}
+.submit-note { font-size: 12px; color: var(--silver); max-width: 340px; line-height: 1.5; }
+.submit-main-btn {
+  background: var(--gold); color: var(--navy);
+  border: none; padding: 14px 32px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem; font-weight: 900; letter-spacing: 0.1em;
+  text-transform: uppercase; cursor: pointer; border-radius: var(--radius);
+  transition: background 0.2s, transform 0.15s; white-space: nowrap;
+}
+.submit-main-btn:hover { background: var(--gold-dark); }
+.submit-main-btn:active { transform: scale(0.97); }
+.error-msg {
+  display: none; background: var(--error-bg); border: 1px solid #f5c6c6;
+  border-radius: var(--radius); padding: 10px 14px;
+  font-size: 13px; color: var(--error); margin-top: 0.75rem;
+}
+.error-msg.visible { display: block; }
+
+/* ── ANALYZING ── */
+.analyzing-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 3rem 2rem; text-align: center; display: none;
+  position: relative; overflow: hidden;
+}
+.analyzing-card::before {
+  content: ''; position: absolute; top: 8px; left: 8px;
+  width: 14px; height: 14px;
+  border-top: 2px solid var(--gold); border-left: 2px solid var(--gold);
+}
+.analyzing-card::after {
+  content: ''; position: absolute; bottom: 8px; right: 8px;
+  width: 14px; height: 14px;
+  border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold);
+}
+.analyzing-card.visible { display: block; }
+.spinner {
+  width: 46px; height: 46px;
+  border: 3px solid var(--armor-grey); border-top-color: var(--gold);
+  border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1.25rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.analyzing-card h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: 1.2rem; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--navy); margin-bottom: 0.4rem;
+}
+.analyzing-card p { font-size: 13px; color: var(--silver); }
+.analyzing-steps { margin-top: 1.5rem; text-align: left; max-width: 300px; margin-left: auto; margin-right: auto; }
+.astep {
+  display: flex; align-items: center; gap: 10px; padding: 5px 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--silver);
+}
+.astep.done { color: var(--success); }
+.astep.active { color: var(--navy); }
+.adot { width: 7px; height: 7px; border-radius: 50%; background: var(--armor-grey); flex-shrink: 0; }
+.astep.done .adot { background: var(--success); }
+.astep.active .adot { background: var(--gold); }
+
+/* ── RESULT ── */
+.result-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  overflow: hidden; display: none; animation: fadeUp 0.4s ease;
+}
+.result-card.visible { display: block; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+.result-header-bar {
+  padding: 1.5rem 1.75rem;
+  display: flex; align-items: flex-start; gap: 1rem;
+  border-bottom: 1px solid var(--armor-grey);
+}
+.result-header-bar.approved { background: var(--navy); }
+.result-header-bar.denied { background: var(--navy); }
+
+.result-status-icon {
+  width: 50px; height: 50px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 900; flex-shrink: 0;
+}
+.result-status-icon.approved { background: var(--gold); color: var(--navy); }
+.result-status-icon.denied { background: rgba(255,255,255,0.1); color: var(--white); }
+
+.result-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: 1.6rem; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--white); line-height: 1.1; margin-bottom: 4px;
+}
+.result-title.approved span { color: var(--gold); }
+.result-subtitle { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+
+.result-body { padding: 1.75rem; }
+.section-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--silver); margin-bottom: 0.6rem;
+}
+.result-analysis { font-size: 14px; line-height: 1.7; color: var(--navy); margin-bottom: 1.5rem; }
+.found-items { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.5rem; }
+.found-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.05em;
+  padding: 5px 12px; border-radius: 2px; text-transform: uppercase;
+}
+.found-tag.match { background: var(--navy); color: var(--gold); }
+.found-tag.fuzzy { background: var(--warn-bg); color: var(--warn); border: 1px solid rgba(139,85,0,0.2); }
+.found-tag.no-match { background: var(--armor-grey); color: var(--silver); }
+
+/* Confidence bar */
+.conf-track { height: 5px; background: var(--armor-grey); border-radius: 0; margin: 5px 0 4px; }
+.conf-fill { height: 100%; transition: width 1s ease; }
+
+/* Reward box */
+.reward-box {
+  background: var(--navy); border-radius: var(--radius);
+  padding: 1.1rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  position: relative; overflow: hidden;
+}
+.reward-box::before {
+  content: ''; position: absolute; top: 6px; left: 6px;
+  width: 10px; height: 10px;
+  border-top: 1.5px solid var(--gold); border-left: 1.5px solid var(--gold);
+}
+.reward-box::after {
+  content: ''; position: absolute; bottom: 6px; right: 6px;
+  width: 10px; height: 10px;
+  border-bottom: 1.5px solid var(--gold); border-right: 1.5px solid var(--gold);
+}
+.reward-label { font-size: 12px; color: rgba(255,255,255,0.6); }
+.reward-sub { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+.reward-amount {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 2rem; font-weight: 900; color: var(--gold);
+  letter-spacing: -0.01em;
+}
+
+.result-footer {
+  border-top: 1px solid var(--armor-grey);
+  padding: 1.1rem 1.75rem;
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.btn-out {
+  background: none; border: 1.5px solid var(--armor-grey); color: var(--navy);
+  padding: 9px 18px; border-radius: var(--radius);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+}
+.btn-out:hover { border-color: var(--navy); background: var(--armor-grey); }
+.btn-prim {
+  border: none; padding: 9px 18px; border-radius: var(--radius);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer;
+  background: var(--gold); color: var(--navy); transition: background 0.2s;
+}
+.btn-prim:hover { background: var(--gold-dark); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--navy); padding: 1.5rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(255,255,255,0.3); flex-wrap: wrap; gap: 0.5rem;
+}
+footer a { color: rgba(255,255,255,0.3); text-decoration: none; }
+footer a:hover { color: var(--gold); }
+
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .preview-wrap { flex-direction: column; }
+  .preview-img-wrap { width: 100%; height: 180px; }
+  .submit-row { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <svg class="shield-logo" viewBox="0 0 36 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18 2L4 8V20C4 29 10.5 37.2 18 40C25.5 37.2 32 29 32 20V8L18 2Z" fill="none" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M18 8C18 8 12 12 12 20C12 24.4 14.7 27.5 18 29C21.3 27.5 24 24.4 24 20C24 12 18 8 18 8Z" fill="none" stroke="#D68F37" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="18" cy="20" r="3" fill="#D68F37"/>
+    </svg>
+    <div class="logo-wordmark">ARMOR<span>FLO</span></div>
+  </div>
+  <nav>
+    <a href="#" class="active">Submit Receipt</a>
+    <a href="#">Support</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="hero-badge">
+    <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
+    Perk Up Rebate Program
+  </div>
+  <h1>EVERY MOTOR.<br><span>EVERY MILE.</span></h1>
+  <div class="tagline">Protection in Motion — Scan your receipt, claim your reward</div>
+  <div class="steps-bar">
+    <div class="step done" id="step1"><div class="step-num">1</div> Shop</div>
+    <div class="step-div"></div>
+    <div class="step active" id="step2"><div class="step-num">2</div> Upload</div>
+    <div class="step-div"></div>
+    <div class="step" id="step3"><div class="step-num">3</div> Verify</div>
+    <div class="step-div"></div>
+    <div class="step" id="step4"><div class="step-num">4</div> Claim</div>
+  </div>
+  <div class="chevrons">
+    <div class="chev"></div><div class="chev"></div><div class="chev"></div>
+    <div class="chev"></div><div class="chev"></div>
+  </div>
+</div>
+
+<main>
+
+  <!-- Upload card -->
+  <div class="card card-bracketed" id="upload-card">
+    <div class="card-header">
+      <div class="card-header-title">01 — Upload <span>Receipt</span></div>
+    </div>
+    <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <div class="upload-icon-wrap">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </div>
+      <h3>Drop your receipt here</h3>
+      <p>Drag & drop an image, or click to browse.<br>JPG, PNG, or HEIC accepted.</p>
+      <button class="upload-btn" onclick="event.stopPropagation()">Choose File</button>
+      <input type="file" id="file-input" accept="image/*" />
+    </div>
+    <div class="preview-wrap" id="preview-wrap">
+      <div class="preview-img-wrap"><img id="preview-img" src="" alt="Receipt" /></div>
+      <div class="preview-info">
+        <div class="preview-filename" id="preview-filename"></div>
+        <div class="preview-size" id="preview-size"></div>
+        <div class="eligibility-box">
+          <strong>Checking against eligible products:</strong>
+          <div class="product-chips" id="product-chips"></div>
+        </div>
+        <button class="remove-btn" onclick="resetUpload()">✕ Remove file</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info form -->
+  <div class="card" id="form-card">
+    <div class="card-header">
+      <div class="card-header-title">02 — Your <span>Information</span></div>
+    </div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="field"><label>First name</label><input type="text" id="fname" placeholder="Jane" /></div>
+        <div class="field"><label>Last name</label><input type="text" id="lname" placeholder="Smith" /></div>
+      </div>
+      <div class="field"><label>Email address</label><input type="email" id="email" placeholder="jane@example.com" /></div>
+      <div class="form-grid">
+        <div class="field"><label>Phone number</label><input type="tel" id="phone" placeholder="(555) 000-0000" /></div>
+        <div class="field"><label>Purchase date</label><input type="date" id="purchase-date" /></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <div class="card" id="submit-card">
+    <div class="card-body">
+      <div class="submit-row">
+        <p class="submit-note">By submitting you agree to the Perk Up program Terms & Conditions. Valid on qualifying ArmorFlo purchases only.</p>
+        <button class="submit-main-btn" onclick="submitReceipt()">Analyze Receipt »</button>
+      </div>
+      <div class="error-msg" id="error-msg"></div>
+    </div>
+  </div>
+
+  <!-- Analyzing -->
+  <div class="analyzing-card" id="analyzing-card">
+    <div class="spinner"></div>
+    <h3>Analyzing Receipt...</h3>
+    <p>Scanning for qualifying ArmorFlo products with fuzzy matching.</p>
+    <div class="analyzing-steps">
+      <div class="astep active" id="as1"><div class="adot"></div> Reading receipt text & OCR</div>
+      <div class="astep" id="as2"><div class="adot"></div> Fuzzy product matching</div>
+      <div class="astep" id="as3"><div class="adot"></div> Calculating rebate eligibility</div>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result-card" id="result-card">
+    <div class="result-header-bar" id="result-header-bar">
+      <div class="result-status-icon" id="result-icon"></div>
+      <div>
+        <div class="result-title" id="result-title"></div>
+        <div class="result-subtitle" id="result-subtitle"></div>
+      </div>
+    </div>
+    <div class="result-body">
+      <div class="section-label">AI Analysis</div>
+      <div class="result-analysis" id="result-analysis"></div>
+      <div class="section-label">Items found on receipt</div>
+      <div class="found-items" id="found-items"></div>
+      <div id="confidence-section"></div>
+      <div id="reward-section"></div>
+    </div>
+    <div class="result-footer">
+      <button class="btn-out" onclick="resetAll()">Submit Another Receipt</button>
+      <button class="btn-prim" id="action-btn"></button>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <span>© 2026 ArmorFlo · Cadence Petroleum Group</span>
+  <span>
+    <a href="#">Terms & Conditions</a> &nbsp;·&nbsp;
+    <a href="#">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="#">Support</a>
+  </span>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// CONFIG — set this to your backend URL when deployed
+// e.g. 'https://your-server.com' or leave empty if served by the backend itself
+// ─────────────────────────────────────────────────────────────
+const API_BASE = window.PERKUP_API_BASE || '';
+
+const FALLBACK_PRODUCTS = [
+  { id:'1', name:'ArmorFlo 5W-30 Full Synthetic', sku:'AF-5W30-FS-QT', category:'Full Synthetic', keywords:['ArmorFlo','Armor Flo','armorflo 5w30','5W-30','5W30','full synthetic','AF-5W30'], rebate:10, status:'active' },
+  { id:'2', name:'ArmorFlo 5W-30 Synthetic Blend', sku:'AF-5W30-SB-QT', category:'Synthetic Blend', keywords:['ArmorFlo','5W-30','5W30','synthetic blend','AF-5W30-SB'], rebate:8, status:'active' },
+  { id:'3', name:'ArmorFlo 10W-40 Synthetic Blend', sku:'AF-10W40-SB-QT', category:'Synthetic Blend', keywords:['ArmorFlo','10W-40','10W40','synthetic blend'], rebate:8, status:'active' },
+  { id:'4', name:'ArmorFlo 0W-20 Full Synthetic', sku:'AF-0W20-FS-QT', category:'Full Synthetic', keywords:['ArmorFlo','0W-20','0W20','full synthetic'], rebate:10, status:'active' },
+];
+const FALLBACK_SETTINGS = {
+  promoName:'ArmorFlo Perk Up', dateStart:'02/19/2024', dateEnd:'04/19/2026',
+  fuzzyThreshold:'medium', requireDate:true,
+  contextPrompt:'This is the ArmorFlo Perk Up rebate program for ArmorFlo motor oil and lubricant products purchased at participating automotive service providers. ArmorFlo is the house brand of Cadence Petroleum Group.'
+};
+
+// Cache loaded from API
+let _activeProducts = null;
+let _settings = null;
+
+async function getActiveProducts() {
+  if (_activeProducts) return _activeProducts;
+  try {
+    const res = await fetch(API_BASE + '/api/admin/products/active');
+    if (!res.ok) throw new Error('API unavailable');
+    const data = await res.json();
+    _activeProducts = data.products || FALLBACK_PRODUCTS;
+    return _activeProducts;
+  } catch {
+    console.warn('Using fallback products — backend not connected');
+    return FALLBACK_PRODUCTS;
+  }
+}
+
+async function getSettings() {
+  if (_settings) return _settings;
+  try {
+    const res = await fetch(API_BASE + '/api/admin/settings');
+    if (!res.ok) throw new Error('API unavailable');
+    const data = await res.json();
+    _settings = data.settings || FALLBACK_SETTINGS;
+    return _settings;
+  } catch {
+    console.warn('Using fallback settings — backend not connected');
+    return FALLBACK_SETTINGS;
+  }
+}
+
+async function saveSubmission(data) {
+  // Submissions from the web form are logged via the admin API
+  try {
+    await fetch(API_BASE + '/api/admin/submissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  } catch { /* non-critical */ }
+}
+
+let uploadedFile = null, uploadedBase64 = null;
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragging'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragging'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragging'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+document.getElementById('file-input').addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+  uploadedFile = file;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const data = ev.target.result;
+    uploadedBase64 = data.split(',')[1];
+    document.getElementById('preview-img').src = data;
+    document.getElementById('preview-filename').textContent = file.name;
+    document.getElementById('preview-size').textContent = formatSize(file.size);
+    document.getElementById('preview-wrap').classList.add('visible');
+    renderChips();
+  };
+  reader.readAsDataURL(file);
+}
+function formatSize(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(1) + ' MB';
+}
+async function renderChips() {
+  const prods = await getActiveProducts();
+  document.getElementById('product-chips').innerHTML =
+    prods.map(p => `<span class="product-chip">${p.name}</span>`).join('') ||
+    '<span style="color:var(--silver);font-size:12px;">No active products</span>';
+}
+function resetUpload() {
+  uploadedFile = null; uploadedBase64 = null;
+  document.getElementById('preview-wrap').classList.remove('visible');
+  document.getElementById('file-input').value = '';
+}
+function showError(msg) { const el = document.getElementById('error-msg'); el.textContent = msg; el.classList.add('visible'); }
+function hideError() { document.getElementById('error-msg').classList.remove('visible'); }
+
+let stepTimer = null;
+function startStepAnim() {
+  let s = 1;
+  ['as1','as2','as3'].forEach(id => document.getElementById(id).className = 'astep');
+  document.getElementById('as1').classList.add('active');
+  stepTimer = setInterval(() => {
+    document.getElementById('as' + s).className = 'astep done';
+    s++;
+    if (s <= 3) document.getElementById('as' + s).classList.add('active');
+    else clearInterval(stepTimer);
+  }, 2200);
+}
+
+function buildPrompt(products, settings) {
+  const fuzzyMap = {
+    strict: 'STRICT matching: exact product names or near-identical text only.',
+    medium: 'MEDIUM fuzzy matching: accept minor typos, abbreviations, partial names, OCR artifacts, spacing/punctuation differences, mixed case. "ArmorFlo" matches "Armor Flo", "ARMORFLO", "Armorflo"; "5W-30" matches "5W30", "SW30".',
+    loose: 'LOOSE fuzzy matching: accept any plausible abbreviation, shorthand, partial name, or descriptor clearly referring to the product.'
+  };
+  const productList = products.map((p, i) =>
+    `${i+1}. "${p.name}" | SKU: ${p.sku||'N/A'} | Category: ${p.category||'N/A'} | Rebate: $${Number(p.rebate||0).toFixed(2)}\n   Fuzzy keywords: ${(p.keywords||[]).join(' | ')}`
+  ).join('\n\n');
+
+  return `You are an automated receipt verification AI for the "${settings.promoName}" rebate program.
+
+PROGRAM CONTEXT: ${settings.context}
+Valid purchase window: ${settings.dateStart} through ${settings.dateEnd}.
+
+FUZZY MATCHING RULE: ${fuzzyMap[settings.fuzzy] || fuzzyMap.medium}
+Always account for: OCR errors, partial text, ALL-CAPS formatting, truncated names, line wraps, receipt shorthand. If the receipt text strongly implies a product, count it as a fuzzy match.
+
+ELIGIBLE PRODUCTS:
+${productList}
+
+TASK:
+1. Read all visible text on the receipt carefully.
+2. For every line item, check against the product catalog using fuzzy matching.
+3. Record: exact receipt text seen, which product it matches, exact vs fuzzy match type, confidence.
+4. Sum rebate amounts for all matches.
+5. Decide APPROVED (at least one qualifying match) or DENIED.
+
+Respond ONLY with this exact JSON — no markdown, no extra text:
+{
+  "approved": true,
+  "receipt_summary": "brief description of the receipt",
+  "matches": [
+    {
+      "receipt_text": "exact text seen",
+      "matched_product": "catalog product name",
+      "match_type": "exact or fuzzy",
+      "match_confidence": "high, medium, or low",
+      "rebate_amount": 10.00
+    }
+  ],
+  "unmatched_items": ["other non-qualifying items"],
+  "total_rebate": 10.00,
+  "analysis": "2-3 sentence friendly explanation for the customer",
+  "denial_reason": null,
+  "overall_confidence": "high, medium, or low"
+}`;
+}
+
+async function submitReceipt() {
+  hideError();
+  if (!uploadedBase64) { showError('Please upload a receipt image first.'); return; }
+  if (!document.getElementById('email').value.trim()) { showError('Please enter your email address.'); return; }
+  const products = await getActiveProducts();
+  if (!products.length) { showError('No active eligible products configured. Please contact support.'); return; }
+  const settings = await getSettings();
+  const fname = document.getElementById('fname').value.trim() || 'Customer';
+  const email = document.getElementById('email').value.trim();
+  const lname = document.getElementById('lname').value.trim();
+
+  ['upload-card','form-card','submit-card'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('analyzing-card').classList.add('visible');
+  startStepAnim();
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: uploadedFile.type || 'image/jpeg', data: uploadedBase64 } },
+            { type: 'text', text: buildPrompt(products, settings) }
+          ]
+        }]
+      })
+    });
+    clearInterval(stepTimer);
+    ['as1','as2','as3'].forEach(id => document.getElementById(id).className = 'astep done');
+    const data = await resp.json();
+    const raw = data.content?.find(b => b.type === 'text')?.text || '';
+    let result;
+    try { result = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch { throw new Error('Could not parse AI response. Please try again.'); }
+
+    await saveSubmission({
+      source: 'web',
+      date: new Date().toISOString(),
+      name: fname + (lname ? ' ' + lname : ''),
+      email, approved: result.approved,
+      totalRebate: result.total_rebate || 0,
+      matches: (result.matches || []).map(m => m.matched_product)
+    });
+    await new Promise(r => setTimeout(r, 500));
+    showResult(result, fname);
+  } catch (err) {
+    clearInterval(stepTimer);
+    ['upload-card','form-card','submit-card'].forEach(id => document.getElementById(id).style.display = '');
+    document.getElementById('analyzing-card').classList.remove('visible');
+    showError('Analysis failed: ' + (err.message || 'Please try again.'));
+  }
+}
+
+function showResult(result, fname) {
+  document.getElementById('analyzing-card').classList.remove('visible');
+  document.getElementById('step2').className = 'step done';
+  document.getElementById('step3').className = 'step done';
+  if (result.approved) document.getElementById('step4').classList.add('active');
+
+  const bar = document.getElementById('result-header-bar');
+  const icon = document.getElementById('result-icon');
+  const title = document.getElementById('result-title');
+  const subtitle = document.getElementById('result-subtitle');
+  const actionBtn = document.getElementById('action-btn');
+
+  bar.className = result.approved ? 'result-header-bar approved' : 'result-header-bar denied';
+
+  if (result.approved) {
+    icon.textContent = '✓'; icon.className = 'result-status-icon approved';
+    title.innerHTML = 'Receipt <span>Approved!</span>'; title.className = 'result-title approved';
+    subtitle.textContent = `Outstanding, ${fname}! Your receipt qualifies for the ArmorFlo Perk Up rebate.`;
+    actionBtn.textContent = 'Claim Your Reward »'; actionBtn.style.background = 'var(--gold)';
+    const total = result.total_rebate ? '$' + Number(result.total_rebate).toFixed(2) : null;
+    document.getElementById('reward-section').innerHTML = total ? `
+      <div class="section-label" style="margin-top:1.5rem;">Your rebate</div>
+      <div class="reward-box">
+        <div>
+          <div class="reward-label">Estimated rebate amount</div>
+          <div class="reward-sub">Prepaid rebate card · Confirmed upon review</div>
+        </div>
+        <div class="reward-amount">${total}</div>
+      </div>` : '';
+  } else {
+    icon.textContent = '✕'; icon.className = 'result-status-icon denied';
+    title.innerHTML = 'Not <span style="color:rgba(255,255,255,0.5)">Approved</span>'; title.className = 'result-title denied';
+    subtitle.textContent = result.denial_reason
+      ? `${fname}, this receipt was not approved: ${result.denial_reason}`
+      : `Sorry, ${fname}. No qualifying ArmorFlo products were found on this receipt.`;
+    actionBtn.textContent = 'Contact Support'; actionBtn.style.background = 'rgba(255,255,255,0.15)'; actionBtn.style.color = 'white';
+    document.getElementById('reward-section').innerHTML = '';
+  }
+
+  document.getElementById('result-analysis').textContent = result.analysis || '';
+
+  const matchTags = (result.matches || []).map(m => {
+    const cls = m.match_type === 'exact' ? 'match' : 'fuzzy';
+    const sym = m.match_type === 'exact' ? '✓' : '≈';
+    return `<span class="found-tag ${cls}" title="Receipt: '${m.receipt_text}'">${sym} ${m.matched_product}${m.rebate_amount ? ' · $' + Number(m.rebate_amount).toFixed(2) : ''}</span>`;
+  });
+  const unmatchedTags = (result.unmatched_items || []).map(i =>
+    `<span class="found-tag no-match">· ${i}</span>`
+  );
+  document.getElementById('found-items').innerHTML =
+    [...matchTags, ...unmatchedTags].join('') ||
+    '<span style="font-size:13px;color:var(--silver);">No line items detected</span>';
+
+  const conf = result.overall_confidence || 'medium';
+  const pct = conf === 'high' ? 92 : conf === 'medium' ? 58 : 24;
+  const color = conf === 'high' ? '#D68F37' : conf === 'medium' ? '#8B5500' : '#8B1A1A';
+  document.getElementById('confidence-section').innerHTML = `
+    <div class="section-label">Match confidence</div>
+    <div class="conf-track"><div class="conf-fill" style="width:${pct}%; background:${color};"></div></div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--silver);margin-bottom:1.5rem;">${conf.toUpperCase()} CONFIDENCE — ${(result.matches||[]).length} qualifying item(s) found</div>
+  `;
+  document.getElementById('result-card').classList.add('visible');
+}
+
+function resetAll() {
+  resetUpload();
+  document.getElementById('result-card').classList.remove('visible');
+  ['upload-card','form-card','submit-card'].forEach(id => document.getElementById(id).style.display = '');
+  ['fname','lname','email','phone','purchase-date'].forEach(id => document.getElementById(id).value = '');
+  hideError();
+  document.getElementById('step3').className = 'step';
+  document.getElementById('step4').className = 'step';
+  document.getElementById('step2').className = 'step active';
+}
+
+renderChips();
+</script>
+</body>
+</html>

@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArmorFlo — Admin Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #0F2C47; --navy-mid: #1a3d5c; --navy-light: #1e4a6e;
+  --gold: #D68F37; --gold-dark: #b87720; --gold-pale: rgba(214,143,55,0.12);
+  --silver: #999999; --armor-grey: #EEEEEE; --white: #FFFFFF;
+  --success: #2d6a2d; --success-bg: #e8f5e8;
+  --error: #8B1A1A; --error-bg: #fdf0f0;
+  --warn: #8B5500; --warn-bg: #fff8ec;
+  --border: rgba(15,44,71,0.10);
+  --radius: 6px; --radius-lg: 10px;
+  --sidebar: 230px;
+}
+body { font-family: 'Barlow', sans-serif; background: var(--armor-grey); color: var(--navy); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ── APP ── */
+.app { display: flex; flex: 1; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar); background: var(--navy);
+  display: flex; flex-direction: column; flex-shrink: 0;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.sidebar-top {
+  padding: 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.sidebar-logo {
+  display: flex; align-items: center; gap: 9px;
+  margin-bottom: 4px;
+}
+.s-shield { width: 28px; height: 28px; }
+.s-wordmark {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: 1.15rem; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--white);
+}
+.s-wordmark span { color: var(--gold); }
+.s-sub {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: rgba(255,255,255,0.3);
+  padding-left: 37px;
+}
+.sidebar-section {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.18em;
+  text-transform: uppercase; color: rgba(255,255,255,0.25);
+  padding: 1.25rem 1.25rem 0.4rem;
+}
+.sidebar-nav a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 1.25rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 0.8rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(255,255,255,0.5);
+  text-decoration: none; transition: all 0.15s; cursor: pointer;
+  border-left: 2px solid transparent;
+}
+.sidebar-nav a:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+.sidebar-nav a.active { color: var(--gold); border-left-color: var(--gold); background: rgba(214,143,55,0.08); }
+.sidebar-nav a svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+.sidebar-spacer { flex: 1; }
+.sidebar-footer {
+  padding: 1rem 1.25rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ── MAIN ── */
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.topbar {
+  background: var(--white); border-bottom: 1px solid var(--border);
+  padding: 0 2rem; height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: 1rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--navy);
+}
+.topbar-title span { color: var(--gold); }
+.topbar-actions { display: flex; gap: 0.75rem; align-items: center; }
+.badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 2px;
+}
+.badge.green { background: var(--success-bg); color: var(--success); }
+.badge.gold { background: var(--gold-pale); color: var(--gold-dark); }
+
+.content { padding: 1.75rem; flex: 1; }
+
+/* ── PAGES ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── STATS ── */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.stat {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem; position: relative; overflow: hidden;
+}
+.stat::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%; background: var(--navy);
+}
+.stat.gold-accent::before { background: var(--gold); }
+.stat-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--silver); margin-bottom: 5px;
+}
+.stat-value {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.8rem; font-weight: 900; color: var(--navy); letter-spacing: -0.02em;
+}
+.stat-value.gold { color: var(--gold-dark); }
+.stat-value.green { color: var(--success); }
+.stat-value.red { color: var(--error); }
+
+/* ── CARD ── */
+.card {
+  background: var(--white); border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem; overflow: hidden;
+}
+.card-header {
+  background: var(--navy); padding: 1rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+}
+.card-header h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: 0.9rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--white);
+}
+.card-header h2 span { color: var(--gold); }
+.card-header p { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+.card-body { padding: 1.5rem; }
+
+/* ── TOOLBAR ── */
+.toolbar {
+  display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+  padding: 1rem 1.5rem; border-bottom: 1px solid var(--armor-grey);
+}
+input[type="text"], input[type="number"], select, textarea {
+  font-family: 'Barlow', sans-serif; font-size: 13px; color: var(--navy);
+  background: var(--armor-grey); border: 1.5px solid transparent;
+  border-radius: var(--radius); outline: none; transition: all 0.2s;
+}
+input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+  border-color: var(--gold); background: var(--white);
+  box-shadow: 0 0 0 3px rgba(214,143,55,0.1);
+}
+.search-input { flex: 1; min-width: 180px; padding: 8px 12px; }
+.filter-sel { padding: 8px 12px; }
+
+/* ── TABLE ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th {
+  text-align: left; padding: 9px 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--silver);
+  background: var(--armor-grey); border-bottom: 1px solid var(--border);
+}
+.data-table td { padding: 11px 14px; border-bottom: 1px solid var(--armor-grey); vertical-align: middle; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: rgba(214,143,55,0.04); }
+.prod-name { font-weight: 600; color: var(--navy); }
+.prod-sku {
+  font-size: 11px; color: var(--silver); margin-top: 1px;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.04em;
+}
+.kw-list { display: flex; flex-wrap: wrap; gap: 3px; }
+.kw-chip {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 2px 7px;
+  background: var(--navy); color: var(--gold); border-radius: 2px;
+}
+.status-pill {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 3px 9px; border-radius: 2px;
+}
+.status-pill.active { background: var(--success-bg); color: var(--success); }
+.status-pill.inactive { background: var(--armor-grey); color: var(--silver); }
+.row-actions { display: flex; gap: 5px; }
+.icon-btn {
+  background: none; border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 4px 10px; cursor: pointer;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--silver); transition: all 0.15s;
+}
+.icon-btn:hover { border-color: var(--navy); color: var(--navy); background: var(--armor-grey); }
+.icon-btn.danger:hover { border-color: var(--error); color: var(--error); background: var(--error-bg); }
+.icon-btn.activate:hover { border-color: var(--gold); color: var(--gold-dark); background: var(--gold-pale); }
+
+/* ── BUTTONS ── */
+.btn {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 12px;
+  font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 8px 16px; border-radius: var(--radius); cursor: pointer; border: none;
+  transition: background 0.2s; white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn-navy { background: var(--navy); color: var(--white); }
+.btn-navy:hover { background: var(--navy-mid); }
+.btn-gold { background: var(--gold); color: var(--navy); }
+.btn-gold:hover { background: var(--gold-dark); }
+.btn-ghost { background: none; border: 1.5px solid var(--border); color: var(--navy); }
+.btn-ghost:hover { background: var(--armor-grey); border-color: var(--silver); }
+.btn-danger { background: none; border: 1.5px solid var(--border); color: var(--error); }
+.btn-danger:hover { background: var(--error-bg); border-color: var(--error); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 200; align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--white); border-radius: var(--radius-lg);
+  width: 100%; max-width: 540px;
+  animation: modalIn 0.2s ease; max-height: 90vh; overflow-y: auto;
+}
+@keyframes modalIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.modal-header {
+  background: var(--navy); padding: 1.1rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.modal-header h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: 1rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--white);
+}
+.modal-header h3 span { color: var(--gold); }
+.modal-close {
+  background: none; border: none; cursor: pointer;
+  font-size: 18px; color: rgba(255,255,255,0.5); padding: 4px; line-height: 1;
+}
+.modal-close:hover { color: var(--white); }
+.modal-body { padding: 1.5rem; }
+.modal-footer {
+  padding: 1rem 1.5rem; border-top: 1px solid var(--armor-grey);
+  display: flex; gap: 0.75rem; justify-content: flex-end;
+}
+
+/* ── FIELDS ── */
+.field { margin-bottom: 1rem; }
+.field:last-child { margin-bottom: 0; }
+label {
+  display: block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--navy); margin-bottom: 5px;
+}
+.field-hint { font-size: 11px; color: var(--silver); margin-top: 4px; line-height: 1.5; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+input[type="text"], input[type="number"] { width: 100%; padding: 9px 12px; }
+textarea { width: 100%; padding: 9px 12px; min-height: 80px; resize: vertical; line-height: 1.5; }
+
+/* ── KEYWORD BUILDER ── */
+.kw-builder { border: 1.5px solid var(--armor-grey); border-radius: var(--radius); overflow: hidden; }
+.kw-input-row { display: flex; }
+.kw-input-row input {
+  flex: 1; border: none; border-radius: 0; padding: 9px 12px;
+  background: var(--armor-grey); font-size: 13px;
+}
+.kw-input-row input:focus { box-shadow: none; background: var(--white); }
+.kw-add-btn {
+  background: var(--gold); color: var(--navy); border: none; padding: 9px 16px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 800; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer; transition: background 0.15s;
+}
+.kw-add-btn:hover { background: var(--gold-dark); }
+.kw-tag-area {
+  padding: 8px; display: flex; flex-wrap: wrap; gap: 5px;
+  min-height: 38px; border-top: 1px solid var(--armor-grey); background: var(--white);
+}
+.kw-item {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 3px 4px 3px 9px;
+  background: var(--navy); color: var(--gold); border-radius: 2px;
+}
+.kw-rm { background: none; border: none; cursor: pointer; color: var(--gold); opacity: 0.6; padding: 0 2px; font-size: 14px; line-height: 1; }
+.kw-rm:hover { opacity: 1; color: white; }
+
+/* ── SETTINGS ── */
+.setting-row {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 1.5rem; padding: 1.25rem 0; border-bottom: 1px solid var(--armor-grey);
+}
+.setting-row:first-child { padding-top: 0; }
+.setting-row:last-child { border-bottom: none; padding-bottom: 0; }
+.setting-label { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.setting-desc { font-size: 12px; color: var(--silver); line-height: 1.5; max-width: 340px; }
+.setting-control { flex-shrink: 0; }
+.toggle { position: relative; width: 40px; height: 22px; cursor: pointer; display: block; }
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute; inset: 0; background: var(--armor-grey);
+  border-radius: 100px; transition: background 0.2s; border: 1px solid var(--border);
+}
+.toggle input:checked + .toggle-track { background: var(--gold); border-color: var(--gold); }
+.toggle-thumb {
+  position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+  background: white; border-radius: 50%; transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle input:checked ~ .toggle-thumb { transform: translateX(18px); }
+
+/* ── SUBMISSIONS ── */
+.sub-status {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 3px 9px; border-radius: 2px;
+}
+.sub-status.approved { background: var(--success-bg); color: var(--success); }
+.sub-status.denied { background: var(--error-bg); color: var(--error); }
+
+/* ── EMPTY STATE ── */
+.empty-state { text-align: center; padding: 3rem 2rem; color: var(--silver); }
+.empty-state svg { width: 40px; height: 40px; stroke: var(--armor-grey); fill: none; stroke-width: 1.5; margin: 0 auto 1rem; display: block; }
+.empty-state h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem; font-weight: 800; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--navy); margin-bottom: 4px;
+}
+.empty-state p { font-size: 13px; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999;
+  background: var(--navy); color: var(--white); padding: 10px 18px;
+  border-radius: var(--radius);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  border-left: 3px solid var(--gold);
+  opacity: 0; transform: translateY(8px); transition: all 0.25s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: none; }
+
+@media (max-width: 680px) {
+  .sidebar { display: none; }
+  .field-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-logo">
+      <svg class="s-shield" viewBox="0 0 36 42" fill="none">
+        <path d="M18 2L4 8V20C4 29 10.5 37.2 18 40C25.5 37.2 32 29 32 20V8L18 2Z" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M18 9C18 9 13 13 13 20C13 24 15.5 27 18 28.5C20.5 27 23 24 23 20C23 13 18 9 18 9Z" fill="none" stroke="#D68F37" stroke-width="1.8"/>
+        <circle cx="18" cy="20" r="2.5" fill="#D68F37"/>
+      </svg>
+      <div class="s-wordmark">ARMOR<span>FLO</span></div>
+    </div>
+    <div class="s-sub">Admin Portal</div>
+  </div>
+  <div class="sidebar-section">Management</div>
+  <nav class="sidebar-nav">
+    <a class="active" onclick="showPage('products')">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Products
+    </a>
+    <a onclick="showPage('submissions')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Submissions
+    </a>
+    <a onclick="showPage('settings')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </a>
+  </nav>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-footer">Perk Up Admin · v2.0</div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Products <span>Catalog</span></div>
+    <div class="topbar-actions">
+      <span class="badge green" id="product-count-badge">0 active</span>
+      <a href="receipt-approval.html" target="_blank" style="text-decoration:none;">
+        <button class="btn btn-ghost" style="font-size:11px; padding:6px 14px;">↗ Customer Site</button>
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- PRODUCTS PAGE -->
+    <div class="page active" id="page-products">
+      <div class="stats" id="stats-row"></div>
+      <div class="card">
+        <div class="card-header">
+          <div><h2>Eligible <span>Products</span></h2><p>Products the AI scanner checks against submitted receipts</p></div>
+          <button class="btn btn-gold" onclick="openAddModal()">+ Add Product</button>
+        </div>
+        <div class="toolbar">
+          <input type="text" class="search-input" id="search-input" placeholder="Search products or keywords…" oninput="renderProducts()" />
+          <select class="filter-sel" id="filter-status" onchange="renderProducts()">
+            <option value="all">All statuses</option>
+            <option value="active">Active only</option>
+            <option value="inactive">Inactive only</option>
+          </select>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Fuzzy Keywords</th>
+              <th>Rebate</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="products-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SUBMISSIONS PAGE -->
+    <div class="page" id="page-submissions">
+      <div class="stats" id="sub-stats-row"></div>
+      <div class="card">
+        <div class="card-header">
+          <div><h2>Receipt <span>Submissions</span></h2><p>All submissions processed by the AI scanner</p></div>
+          <button class="btn btn-ghost" style="font-size:11px;padding:6px 14px;" onclick="clearSubmissions()">Clear All</button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Name</th><th>Email</th><th>Matched Products</th><th>Rebate</th><th>Result</th></tr></thead>
+          <tbody id="submissions-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="card">
+        <div class="card-header"><div><h2>Promotion <span>Settings</span></h2><p>Configure how the AI scanner evaluates receipts</p></div></div>
+        <div class="card-body">
+          <div class="setting-row">
+            <div><div class="setting-label">Promotion name</div><div class="setting-desc">Shown to customers on the submission page.</div></div>
+            <div class="setting-control"><input type="text" id="s-promo-name" value="ArmorFlo Perk Up" style="width:200px;" /></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Valid date range</div><div class="setting-desc">Receipts outside this window will be auto-denied.</div></div>
+            <div class="setting-control" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <input type="text" id="s-date-start" placeholder="02/19/2024" style="width:115px;" />
+              <span style="color:var(--silver);font-size:12px;">to</span>
+              <input type="text" id="s-date-end" placeholder="04/19/2026" style="width:115px;" />
+            </div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Fuzzy match threshold</div><div class="setting-desc">How strictly the AI matches product names on receipts.</div></div>
+            <div class="setting-control">
+              <select id="s-fuzzy" style="padding:8px 12px;width:160px;">
+                <option value="strict">Strict — exact only</option>
+                <option value="medium" selected>Medium — minor typos OK</option>
+                <option value="loose">Loose — abbreviations OK</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Require purchase date on receipt</div><div class="setting-desc">Deny receipts where no legible date can be found.</div></div>
+            <div class="setting-control">
+              <label class="toggle"><input type="checkbox" id="s-req-date" checked /><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Context prompt</div><div class="setting-desc">Sent to the AI to help it evaluate receipts accurately.</div></div>
+            <div class="setting-control" style="width:100%;max-width:380px;">
+              <textarea id="s-context" style="width:100%;min-height:80px;">This is the ArmorFlo Perk Up rebate program for ArmorFlo motor oil and lubricant products purchased at participating automotive service providers. ArmorFlo is the house brand of Cadence Petroleum Group.</textarea>
+            </div>
+          </div>
+          <div style="margin-top:1.25rem;">
+            <button class="btn btn-gold" onclick="saveSettings()">Save Settings</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOnBg(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Add <span>Product</span></h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Product name *</label>
+        <input type="text" id="m-name" placeholder="e.g. ArmorFlo 5W-30 Full Synthetic" />
+      </div>
+      <div class="field-row">
+        <div class="field"><label>SKU / Product code</label><input type="text" id="m-sku" placeholder="e.g. AF-5W30-FS-QT" /></div>
+        <div class="field"><label>Rebate amount ($)</label><input type="number" id="m-rebate" placeholder="10.00" step="0.01" min="0" /></div>
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="m-category" style="width:100%;padding:9px 12px;">
+          <option value="">— Select category —</option>
+          <option>Motor Oil</option>
+          <option>Synthetic Blend</option>
+          <option>Full Synthetic</option>
+          <option>Oil Filter</option>
+          <option>Transmission Fluid</option>
+          <option>Gear Oil</option>
+          <option>Additive</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Fuzzy Match Keywords</label>
+        <div class="kw-builder">
+          <div class="kw-input-row">
+            <input type="text" id="kw-input" placeholder="Type a keyword and press Enter or Add…" onkeydown="kwKeydown(event)" />
+            <button class="kw-add-btn" onclick="addKeyword()">Add</button>
+          </div>
+          <div class="kw-tag-area" id="kw-tags"></div>
+        </div>
+        <div class="field-hint">Add every variation, abbreviation, or alternate spelling. The AI will fuzzy-match these against receipt text including OCR errors and shorthand.</div>
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select id="m-status" style="width:100%;padding:9px 12px;">
+          <option value="active">Active — eligible for rebate</option>
+          <option value="inactive">Inactive — not eligible</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Internal notes</label>
+        <textarea id="m-notes" placeholder="Optional notes visible to admin only…" style="min-height:56px;"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// CONFIG — change this to your backend URL when deployed
+// e.g. 'https://your-server.com' or 'https://your-app.railway.app'
+// Leave as empty string to auto-detect (works when served by the backend)
+// ─────────────────────────────────────────────────────────────
+const API_BASE = window.PERKUP_API_BASE || '';
+
+async function api(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API_BASE + '/api/admin' + path, opts);
+  if (!res.ok) throw new Error(`API error ${res.status}: ${await res.text()}`);
+  return res.json();
+}
+
+let products = [];
+let editingId = null;
+let currentKeywords = [];
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.sidebar-nav a')[['products','submissions','settings'].indexOf(name)].classList.add('active');
+  const titles = { products: 'Products <span>Catalog</span>', submissions: 'Receipt <span>Submissions</span>', settings: 'Promotion <span>Settings</span>' };
+  document.getElementById('topbar-title').innerHTML = titles[name];
+  if (name === 'submissions') loadSubmissions();
+  if (name === 'settings') loadSettingsUI();
+}
+
+function renderStats() {
+  const active = products.filter(p => p.status === 'active').length;
+  const inactive = products.filter(p => p.status === 'inactive').length;
+  const totalKw = products.reduce((s, p) => s + (p.keywords||[]).length, 0);
+  const avgRebate = active ? (products.filter(p=>p.status==='active').reduce((s,p)=>s+(p.rebate||0),0)/active).toFixed(2) : '0.00';
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat gold-accent"><div class="stat-label">Active Products</div><div class="stat-value green">${active}</div></div>
+    <div class="stat"><div class="stat-label">Inactive</div><div class="stat-value">${inactive}</div></div>
+    <div class="stat"><div class="stat-label">Total Keywords</div><div class="stat-value gold">${totalKw}</div></div>
+    <div class="stat"><div class="stat-label">Avg Rebate</div><div class="stat-value">$${avgRebate}</div></div>
+  `;
+  document.getElementById('product-count-badge').textContent = active + ' active';
+}
+
+function renderProducts() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const fs = document.getElementById('filter-status').value;
+  let rows = products.filter(p => {
+    const mQ = !q || p.name.toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q) || (p.keywords||[]).some(k=>k.toLowerCase().includes(q));
+    const mS = fs === 'all' || p.status === fs;
+    return mQ && mS;
+  });
+  const tbody = document.getElementById('products-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>
+      <h3>No Products Found</h3><p>Try a different search, or add a new product.</p>
+    </div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(p => `
+    <tr>
+      <td><div class="prod-name">${esc(p.name)}</div><div class="prod-sku">${esc(p.sku||'—')} · ${esc(p.category||'Uncategorized')}</div></td>
+      <td><div class="kw-list">${(p.keywords||[]).slice(0,4).map(k=>`<span class="kw-chip">${esc(k)}</span>`).join('')}${(p.keywords||[]).length>4?`<span class="kw-chip">+${(p.keywords||[]).length-4}</span>`:''}</div></td>
+      <td>${p.rebate ? '<strong>$'+Number(p.rebate).toFixed(2)+'</strong>' : '—'}</td>
+      <td><span class="status-pill ${p.status}">${p.status}</span></td>
+      <td><div class="row-actions">
+        <button class="icon-btn" onclick="openEditModal('${p.id}')">Edit</button>
+        <button class="icon-btn ${p.status==='active'?'':'activate'}" onclick="toggleStatus('${p.id}')">${p.status==='active'?'Deactivate':'Activate'}</button>
+        <button class="icon-btn danger" onclick="deleteProduct('${p.id}')">Delete</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+async function loadProducts() {
+  try {
+    const data = await api('GET', '/products');
+    products = data.products || [];
+    renderStats();
+    renderProducts();
+  } catch(e) {
+    console.error('Failed to load products:', e);
+    toast('Could not connect to backend — check API_BASE in admin.html');
+  }
+}
+
+async function toggleStatus(id) {
+  const p = products.find(x=>x.id===id); if (!p) return;
+  const newStatus = p.status==='active'?'inactive':'active';
+  try {
+    await api('PUT', `/products/${id}`, { status: newStatus });
+    p.status = newStatus;
+    renderProducts(); renderStats();
+    toast(newStatus==='active'?'Product activated':'Product deactivated');
+  } catch(e) { toast('Failed to update product'); }
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete this product? This cannot be undone.')) return;
+  try {
+    await api('DELETE', `/products/${id}`);
+    products = products.filter(p=>p.id!==id);
+    renderProducts(); renderStats(); toast('Product deleted');
+  } catch(e) { toast('Failed to delete product'); }
+}
+
+function openAddModal() {
+  editingId = null; currentKeywords = [];
+  document.getElementById('modal-title').innerHTML = 'Add <span>Product</span>';
+  ['m-name','m-sku','m-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('m-rebate').value = '';
+  document.getElementById('m-category').value = '';
+  document.getElementById('m-status').value = 'active';
+  renderKwTags();
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('m-name').focus(), 100);
+}
+function openEditModal(id) {
+  const p = products.find(x=>x.id===id); if (!p) return;
+  editingId = id; currentKeywords = [...(p.keywords||[])];
+  document.getElementById('modal-title').innerHTML = 'Edit <span>Product</span>';
+  document.getElementById('m-name').value = p.name;
+  document.getElementById('m-sku').value = p.sku||'';
+  document.getElementById('m-rebate').value = p.rebate||'';
+  document.getElementById('m-category').value = p.category||'';
+  document.getElementById('m-status').value = p.status;
+  document.getElementById('m-notes').value = p.notes||'';
+  renderKwTags();
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+function closeModalOnBg(e) { if (e.target===document.getElementById('modal-overlay')) closeModal(); }
+
+async function saveProduct() {
+  const name = document.getElementById('m-name').value.trim();
+  if (!name) { alert('Product name is required.'); return; }
+  const payload = {
+    name,
+    sku: document.getElementById('m-sku').value.trim(),
+    rebate: parseFloat(document.getElementById('m-rebate').value)||0,
+    category: document.getElementById('m-category').value,
+    keywords: [...currentKeywords],
+    status: document.getElementById('m-status').value,
+    notes: document.getElementById('m-notes').value.trim(),
+  };
+  try {
+    if (editingId) {
+      const data = await api('PUT', `/products/${editingId}`, payload);
+      const idx = products.findIndex(p=>p.id===editingId);
+      if (idx!==-1) products[idx] = data.product;
+      toast('Product updated');
+    } else {
+      const data = await api('POST', '/products', payload);
+      products.unshift(data.product);
+      toast('Product added');
+    }
+    renderProducts(); renderStats(); closeModal();
+  } catch(e) { toast('Failed to save product'); }
+}
+
+function kwKeydown(e) { if (e.key==='Enter') { e.preventDefault(); addKeyword(); } }
+function addKeyword() {
+  const val = document.getElementById('kw-input').value.trim();
+  if (!val || currentKeywords.includes(val)) return;
+  currentKeywords.push(val);
+  document.getElementById('kw-input').value = '';
+  renderKwTags();
+}
+function removeKeyword(kw) { currentKeywords = currentKeywords.filter(k=>k!==kw); renderKwTags(); }
+function renderKwTags() {
+  document.getElementById('kw-tags').innerHTML = currentKeywords.map(k =>
+    `<span class="kw-item">${esc(k)}<button class="kw-rm" onclick="removeKeyword('${esc(k)}')">×</button></span>`
+  ).join('') || '<span style="font-size:11px;color:var(--silver);padding:4px 2px;">No keywords yet — add above</span>';
+}
+
+async function loadSubmissions() {
+  try {
+    const data = await api('GET', '/submissions');
+    const subs = data.submissions || [];
+    const stats = data.stats || {};
+    document.getElementById('sub-stats-row').innerHTML = `
+      <div class="stat gold-accent"><div class="stat-label">Total Submissions</div><div class="stat-value">${stats.total||0}</div></div>
+      <div class="stat"><div class="stat-label">Approved</div><div class="stat-value green">${stats.approved||0}</div></div>
+      <div class="stat"><div class="stat-label">Denied</div><div class="stat-value red">${stats.denied||0}</div></div>
+      <div class="stat"><div class="stat-label">Total Rebates</div><div class="stat-value gold">$${stats.totalRebates||'0.00'}</div></div>
+    `;
+    const tbody = document.getElementById('submissions-tbody');
+    if (!subs.length) {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16h16V8z"/></svg>
+        <h3>No Submissions Yet</h3><p>Submissions from web and SMS will both appear here.</p>
+      </div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = subs.map(s=>`
+      <tr>
+        <td style="white-space:nowrap;font-size:12px;color:var(--silver);">${new Date(s.createdAt||s.date).toLocaleDateString()}</td>
+        <td>${esc(s.name||'—')}</td>
+        <td style="font-size:12px;color:var(--silver);">${esc(s.email||s.phone||'—')}</td>
+        <td><div class="kw-list">${(s.matches||[]).slice(0,3).map(m=>`<span class="kw-chip">${esc(m)}</span>`).join('')}</div></td>
+        <td>${s.totalRebate||s.rebate ? '$'+(Number(s.totalRebate||0)||Number(String(s.rebate||'0').replace(/[^0-9.]/g,''))).toFixed(2) : '—'}</td>
+        <td><span class="sub-status ${s.approved?'approved':'denied'}">${s.approved?'Approved':'Denied'}</span></td>
+      </tr>`).join('');
+  } catch(e) {
+    console.error('Failed to load submissions:', e);
+  }
+}
+
+async function loadSettingsUI() {
+  try {
+    const data = await api('GET', '/settings');
+    const s = data.settings || {};
+    document.getElementById('s-promo-name').value = s.promoName||'';
+    document.getElementById('s-date-start').value = s.dateStart||'';
+    document.getElementById('s-date-end').value = s.dateEnd||'';
+    document.getElementById('s-fuzzy').value = s.fuzzyThreshold||s.fuzzy||'medium';
+    document.getElementById('s-req-date').checked = s.requireDate||s.reqDate||false;
+    document.getElementById('s-context').value = s.contextPrompt||s.context||'';
+  } catch(e) { toast('Could not load settings'); }
+}
+
+async function saveSettings() {
+  try {
+    await api('PUT', '/settings', {
+      promoName: document.getElementById('s-promo-name').value.trim(),
+      dateStart: document.getElementById('s-date-start').value.trim(),
+      dateEnd: document.getElementById('s-date-end').value.trim(),
+      fuzzyThreshold: document.getElementById('s-fuzzy').value,
+      requireDate: document.getElementById('s-req-date').checked,
+      contextPrompt: document.getElementById('s-context').value.trim(),
+    });
+    toast('Settings saved');
+  } catch(e) { toast('Failed to save settings'); }
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── Boot ──
+loadProducts();
+</script>
+</body>
+</html>
