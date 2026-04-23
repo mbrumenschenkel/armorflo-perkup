@@ -107,7 +107,12 @@ async function analyzeReceipt(mediaUrl, products, settings) {
 
   const raw = response.content.find(b => b.type === 'text')?.text || '';
   const cleaned = raw.replace(/```json|```/g, '').trim();
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch (err) {
+    console.error('[analyzer] Failed to parse Claude response (first 500 chars):', cleaned.slice(0, 500));
+    throw new Error('Analyzer returned invalid JSON: ' + err.message);
+  }
 }
 
 module.exports = { analyzeReceipt };

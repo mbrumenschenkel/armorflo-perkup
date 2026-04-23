@@ -2,7 +2,7 @@
  * routes/admin.js
  * ─────────────────────────────────────────────────────────────
  * REST API for the admin.html frontend.
- * In production, add authentication middleware before these routes.
+ * Auth is applied in server.js via the requireAdmin middleware.
  */
 
 const express = require('express');
@@ -12,53 +12,50 @@ const {
   getAllProducts, getActiveProducts, getSettings,
   updateSettings, addProduct, updateProduct, deleteProduct,
 } = require('../services/products');
-const { getSubmissions } = require('../services/store');
+const { getSubmissions, saveSubmission } = require('../services/store');
 
-// ── CORS for local development (remove in production or restrict origin) ──
-router.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-  if (req.method === 'OPTIONS') return res.sendStatus(200);
-  next();
-});
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // ── Products ──────────────────────────────────────────────────
 
-// GET all products
 router.get('/products', (req, res) => {
   res.json({ products: getAllProducts() });
 });
 
-// GET active products only
 router.get('/products/active', (req, res) => {
   res.json({ products: getActiveProducts() });
 });
 
-// POST add product
 router.post('/products', (req, res) => {
-  const { name, sku, category, keywords, rebate, status, notes } = req.body;
-  if (!name) return res.status(400).json({ error: 'Product name is required' });
+  const { name, sku, category, keywords, rebate, status, notes } = req.body || {};
+  if (!name || typeof name !== 'string' || name.length > 200) {
+    return res.status(400).json({ error: 'Valid product name is required' });
+  }
+  const rebateNum = parseFloat(rebate);
+  if (rebate !== undefined && rebate !== '' &&
+      (!Number.isFinite(rebateNum) || rebateNum < 0 || rebateNum > 10000)) {
+    return res.status(400).json({ error: 'Rebate must be a number between 0 and 10000' });
+  }
   const product = addProduct({
     id: uuidv4(),
-    name, sku: sku || '', category: category || '',
-    keywords: Array.isArray(keywords) ? keywords : [],
-    rebate: parseFloat(rebate) || 0,
-    status: status || 'active',
-    notes: notes || '',
+    name,
+    sku: typeof sku === 'string' ? sku : '',
+    category: typeof category === 'string' ? category : '',
+    keywords: Array.isArray(keywords) ? keywords.filter(k => typeof k === 'string') : [],
+    rebate: Number.isFinite(rebateNum) ? rebateNum : 0,
+    status: status === 'inactive' ? 'inactive' : 'active',
+    notes: typeof notes === 'string' ? notes : '',
     createdAt: new Date().toISOString(),
   });
   res.status(201).json({ product });
 });
 
-// PUT update product
 router.put('/products/:id', (req, res) => {
   const updated = updateProduct(req.params.id, req.body);
   if (!updated) return res.status(404).json({ error: 'Product not found' });
   res.json({ product: updated });
 });
 
-// DELETE product
 router.delete('/products/:id', (req, res) => {
   const deleted = deleteProduct(req.params.id);
   if (!deleted) return res.status(404).json({ error: 'Product not found' });
@@ -72,7 +69,7 @@ router.get('/settings', (req, res) => {
 });
 
 router.put('/settings', (req, res) => {
-  const updated = updateSettings(req.body);
+  const updated = updateSettings(req.body || {});
   res.json({ settings: updated });
 });
 
@@ -92,11 +89,32 @@ router.get('/submissions', (req, res) => {
   res.json({ submissions: subs, stats });
 });
 
-// POST a web-form submission (called by receipt-approval.html)
 router.post('/submissions', (req, res) => {
-  const { saveSubmission } = require('../services/store');
-  saveSubmission({ ...req.body, source: req.body.source || 'web' });
-  res.status(201).json({ success: true });
+  const body = req.body || {};
+  const { email, name, approved, totalRebate } = body;
+
+  if (!name || typeof name !== 'string' || name.length > 100) {
+    return res.status(400).json({ error: 'Valid name is required' });
+  }
+  if (!email || typeof email !== 'string' || !EMAIL_RE.test(email)) {
+    return res.status(400).json({ error: 'Valid email is required' });
+  }
+  if (typeof approved !== 'boolean') {
+    return res.status(400).json({ error: 'approved (boolean) is required' });
+  }
+
+  const rebateNum = Number(totalRebate);
+  if (totalRebate !== undefined && totalRebate !== null && totalRebate !== '' &&
+      (!Number.isFinite(rebateNum) || rebateNum < 0 || rebateNum > 10000)) {
+    return res.status(400).json({ error: 'totalRebate must be a number between 0 and 10000' });
+  }
+
+  const id = saveSubmission({
+    ...body,
+    totalRebate: Number.isFinite(rebateNum) ? rebateNum : 0,
+    source: body.source === 'sms' ? 'sms' : 'web',
+  });
+  res.status(201).json({ success: true, id });
 });
 
 module.exports = router;

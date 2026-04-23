@@ -602,9 +602,9 @@ footer a:hover { color: var(--gold); }
 <footer>
   <span>© 2026 ArmorFlo · Cadence Petroleum Group</span>
   <span>
-    <a href="#">Terms & Conditions</a> &nbsp;·&nbsp;
-    <a href="#">Privacy Policy</a> &nbsp;·&nbsp;
-    <a href="#">Support</a>
+    <a href="/terms-and-conditions">Terms &amp; Conditions</a> &nbsp;·&nbsp;
+    <a href="/privacy-policy">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="https://www.cadenceperkup.com/support">Support</a>
   </span>
 </footer>
 
@@ -614,6 +614,16 @@ footer a:hover { color: var(--gold); }
 // e.g. 'https://your-server.com' or leave empty if served by the backend itself
 // ─────────────────────────────────────────────────────────────
 const API_BASE = window.PERKUP_API_BASE || '';
+
+// Escape untrusted strings before inserting into innerHTML.
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 const FALLBACK_PRODUCTS = [
   { id:'1', name:'ArmorFlo 5W-30 Full Synthetic', sku:'AF-5W30-FS-QT', category:'Full Synthetic', keywords:['ArmorFlo','Armor Flo','armorflo 5w30','5W-30','5W30','full synthetic','AF-5W30'], rebate:10, status:'active' },
@@ -873,10 +883,11 @@ function showResult(result, fname) {
   const matchTags = (result.matches || []).map(m => {
     const cls = m.match_type === 'exact' ? 'match' : 'fuzzy';
     const sym = m.match_type === 'exact' ? '✓' : '≈';
-    return `<span class="found-tag ${cls}" title="Receipt: '${m.receipt_text}'">${sym} ${m.matched_product}${m.rebate_amount ? ' · $' + Number(m.rebate_amount).toFixed(2) : ''}</span>`;
+    const rebate = m.rebate_amount ? ' · $' + Number(m.rebate_amount).toFixed(2) : '';
+    return `<span class="found-tag ${cls}" title="Receipt: '${esc(m.receipt_text)}'">${sym} ${esc(m.matched_product)}${rebate}</span>`;
   });
   const unmatchedTags = (result.unmatched_items || []).map(i =>
-    `<span class="found-tag no-match">· ${i}</span>`
+    `<span class="found-tag no-match">· ${esc(i)}</span>`
   );
   document.getElementById('found-items').innerHTML =
     [...matchTags, ...unmatchedTags].join('') ||

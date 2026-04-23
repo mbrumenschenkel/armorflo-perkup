@@ -30,10 +30,15 @@ const { getSession, setSession, clearSession, saveSubmission } = require('../ser
 
 const MessagingResponse = twilio.twiml.MessagingResponse;
 
-// ── Twilio signature validation (optional but recommended in production) ──
-// Uncomment to enable:
-// const validateRequest = require('../middleware/validateTwilio');
-// router.use(validateRequest);
+// ── Twilio signature validation (production only) ──
+// In dev, leaving this off makes local curl/Postman testing possible.
+if (process.env.NODE_ENV === 'production') {
+  const validateRequest = require('../middleware/validateTwilio');
+  router.use(validateRequest);
+}
+
+// ── Per-phone rate limit on the webhook ──
+router.use(require('../middleware/smsRateLimit'));
 
 // ── Trigger keywords that start a new session ──
 const TRIGGER_WORDS = ['cadence', 'perkup', 'perk up', 'armorflo', 'rewards', 'rebate', 'start'];
@@ -159,8 +164,14 @@ router.post('/incoming', async (req, res) => {
     // Process asynchronously so we don't hold up the TwiML response
     setImmediate(async () => {
       try {
-        const products = getActiveProducts();
-        const settings = getSettings();
+        let products, settings;
+        try {
+          products = getActiveProducts();
+          settings = getSettings();
+        } catch (cfgErr) {
+          console.error('[sms] Failed to load products/settings:', cfgErr.message);
+          throw new Error('Configuration unavailable');
+        }
         const result = await analyzeReceipt(mediaUrl, products, settings);
 
         const submissionId = uuidv4();
