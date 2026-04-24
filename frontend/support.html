@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Support — ArmorFlo Perk Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --navy: #0F2C47; --gold: #D68F37; --gold-dark: #b87720; --silver: #999; --grey: #EEEEEE; --white: #fff; --border: rgba(15,44,71,0.10); }
+body { font-family: 'Barlow', sans-serif; background: var(--grey); color: var(--navy); min-height: 100vh; }
+header { background: var(--navy); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.4rem; letter-spacing: 0.04em; color: white; text-decoration: none; text-transform: uppercase; }
+.logo span { color: var(--gold); }
+nav a { font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); text-decoration: none; margin-left: 1.5rem; }
+nav a:hover { color: var(--gold); }
+.hero { background: var(--navy); padding: 2.5rem 2rem; text-align: center; border-bottom: 3px solid var(--gold); }
+.hero-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+.hero h1 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: 0.04em; text-transform: uppercase; color: white; margin-bottom: 6px; }
+.hero-tag { font-size: 13px; color: rgba(255,255,255,0.55); letter-spacing: 0.04em; }
+main { max-width: 780px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+.doc { background: white; border-radius: 10px; overflow: hidden; }
+.section { padding: 2rem 2.5rem; border-bottom: 1px solid var(--grey); }
+.section:last-child { border-bottom: none; }
+.section-num { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+.section h2 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.1rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--navy); margin-bottom: 1rem; }
+h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.03em; color: var(--navy); margin-top: 1.25rem; margin-bottom: 0.5rem; text-transform: uppercase; }
+p { font-size: 14px; line-height: 1.8; color: #444; margin-bottom: 0.9rem; }
+p:last-child { margin-bottom: 0; }
+ul { font-size: 14px; line-height: 1.8; color: #444; padding-left: 1.25rem; margin-bottom: 0.9rem; }
+ul li { margin-bottom: 4px; }
+a { color: var(--gold-dark); }
+.contact-box { background: var(--navy); border-radius: 8px; padding: 1.5rem; margin-top: 1rem; }
+.contact-box p { color: rgba(255,255,255,0.75); margin-bottom: 8px; font-size: 14px; }
+.contact-box a { color: var(--gold); font-weight: 600; }
+.contact-box p:last-child { margin-bottom: 0; }
+.contact-box .label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+.quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+.action-card { border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; text-decoration: none; color: var(--navy); transition: border-color .15s, transform .15s; display: block; }
+.action-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.action-card .label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+.action-card .title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--navy); margin-bottom: 4px; }
+.action-card .desc { font-size: 13px; color: #666; line-height: 1.5; }
+.faq { margin-top: 0.5rem; }
+.faq details { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; overflow: hidden; }
+.faq summary { cursor: pointer; padding: 0.85rem 1rem; font-weight: 600; font-size: 14px; color: var(--navy); list-style: none; position: relative; background: #fafafa; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: var(--gold); font-weight: 300; }
+.faq details[open] summary::after { content: '−'; }
+.faq details[open] summary { background: white; border-bottom: 1px solid var(--grey); }
+.faq .answer { padding: 1rem; font-size: 14px; line-height: 1.7; color: #444; }
+footer { background: var(--navy); padding: 1.5rem 2rem; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+footer a { color: rgba(255,255,255,0.3); text-decoration: none; }
+footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="/">ARMOR<span>FLO</span></a>
+  <nav>
+    <a href="/">Submit Receipt</a>
+    <a href="/support">Support</a>
+  </nav>
+</header>
+<div class="hero">
+  <div class="hero-label">We're Here to Help</div>
+  <h1>Support</h1>
+  <div class="hero-tag">Questions about your rebate? Start here.</div>
+</div>
+<main>
+<div class="doc">
+
+  <div class="section">
+    <div class="section-num">Get Help</div>
+    <h2>Quick Actions</h2>
+    <div class="quick-actions">
+      <a class="action-card" href="/">
+        <div class="label">Start</div>
+        <div class="title">Submit a Receipt</div>
+        <div class="desc">Upload a photo of your qualifying ArmorFlo purchase.</div>
+      </a>
+      <a class="action-card" href="sms:+13365519252">
+        <div class="label">Text</div>
+        <div class="title">SMS Submission</div>
+        <div class="desc">Text CADENCE to +1 (336) 551-9252 to submit by message.</div>
+      </a>
+      <a class="action-card" href="mailto:rewards@cadencepetroleum.com">
+        <div class="label">Email</div>
+        <div class="title">Email Support</div>
+        <div class="desc">Reach our rebate team at rewards@cadencepetroleum.com.</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-num">Common Questions</div>
+    <h2>Frequently Asked</h2>
+    <div class="faq">
+
+      <details>
+        <summary>How do I submit a receipt?</summary>
+        <div class="answer">
+          Two ways:
+          <ul>
+            <li><strong>Web:</strong> Go to the <a href="/">home page</a>, drag or upload a photo of your receipt, fill in your name and email, and click Analyze Receipt.</li>
+            <li><strong>SMS:</strong> Text <strong>CADENCE</strong> to <strong>+1 (336) 551-9252</strong> and follow the prompts. The bot will ask for your name, email, and then a photo of the receipt.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details>
+        <summary>What products qualify for a rebate?</summary>
+        <div class="answer">
+          Eligible ArmorFlo products are listed in the program at time of purchase. The AI scanner checks your receipt against the current active product catalog. If no qualifying items are found, the submission is denied and you'll see a denial reason.
+        </div>
+      </details>
+
+      <details>
+        <summary>How long does it take to get my rebate?</summary>
+        <div class="answer">
+          The AI reviews your receipt within seconds and you'll see an instant approval or denial message. Approved rebates are issued as prepaid reward cards. Allow <strong>6–8 weeks</strong> from approval for your card to arrive by mail.
+        </div>
+      </details>
+
+      <details>
+        <summary>My receipt was denied — what can I do?</summary>
+        <div class="answer">
+          The denial message includes a reason. The most common causes are:
+          <ul>
+            <li>No qualifying ArmorFlo products were found on the receipt.</li>
+            <li>The purchase date falls outside the current promo window.</li>
+            <li>Product names on the receipt are too blurry or cut off to read.</li>
+          </ul>
+          If you believe the denial was a mistake, email <a href="mailto:rewards@cadencepetroleum.com">rewards@cadencepetroleum.com</a> with a copy of your receipt and we'll review it manually.
+        </div>
+      </details>
+
+      <details>
+        <summary>Can I submit multiple receipts?</summary>
+        <div class="answer">
+          Yes — each qualifying purchase can be submitted as a separate receipt. There is no per-customer limit as long as each submission represents a distinct purchase.
+        </div>
+      </details>
+
+      <details>
+        <summary>What phone carriers are supported for SMS?</summary>
+        <div class="answer">
+          AT&T, Verizon, T-Mobile, Sprint, and most major US carriers. Message and data rates may apply. Text <strong>HELP</strong> to our number for instructions or <strong>STOP</strong> to unsubscribe.
+        </div>
+      </details>
+
+      <details>
+        <summary>How do I claim my approved rebate?</summary>
+        <div class="answer">
+          After an approval, you'll receive a claim link via SMS and/or a confirmation email. Click the link, enter your shipping address, and submit. Your prepaid card will be mailed within 6–8 weeks.
+        </div>
+      </details>
+
+      <details>
+        <summary>Is my personal information safe?</summary>
+        <div class="answer">
+          We only collect the information needed to process your rebate (name, email, phone number, and receipt images). See our <a href="/privacy-policy">Privacy Policy</a> for full details on how we handle your data.
+        </div>
+      </details>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-num">Contact</div>
+    <h2>Get in Touch</h2>
+    <p>If you can't find the answer you need above, our team is standing by. We respond to most emails within one business day.</p>
+    <div class="contact-box">
+      <div class="label">Rebate Program Support</div>
+      <p><strong>Email:</strong> <a href="mailto:rewards@cadencepetroleum.com">rewards@cadencepetroleum.com</a></p>
+      <p><strong>SMS:</strong> <a href="sms:+13365519252">+1 (336) 551-9252</a> (text CADENCE to start, HELP for info)</p>
+      <p><strong>Hours:</strong> Monday – Friday, 9 AM – 5 PM ET</p>
+    </div>
+  </div>
+
+</div>
+</main>
+<footer>
+  <div>© 2026 ArmorFlo · Cadence Petroleum Group &nbsp;·&nbsp; <a href="/privacy-policy">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms-and-conditions">Terms &amp; Conditions</a> &nbsp;·&nbsp; <a href="/support">Support</a></div>
+</footer>
+</body>
+</html>

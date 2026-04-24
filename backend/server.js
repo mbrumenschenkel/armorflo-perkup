@@ -51,6 +51,7 @@ app.get('/', (req, res) => res.sendFile(path.join(frontendPath, 'receipt-approva
 app.get('/admin', (req, res) => res.sendFile(path.join(frontendPath, 'admin.html')));
 app.get('/privacy-policy', (req, res) => res.sendFile(path.join(frontendPath, 'privacy-policy.html')));
 app.get('/terms-and-conditions', (req, res) => res.sendFile(path.join(frontendPath, 'terms-and-conditions.html')));
+app.get('/support', (req, res) => res.sendFile(path.join(frontendPath, 'support.html')));
 
 // Claim portal — served gracefully if claim.html is missing.
 app.get('/claim', (req, res) => {
