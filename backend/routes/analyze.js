@@ -82,7 +82,9 @@ router.post('/', rateLimit, async (req, res) => {
     // Map known upstream failures to actionable public messages.
     const msg = String(err.message || '');
     let publicMsg;
-    if (upstreamStatus === 401 || /unauthorized|api[_-]?key/i.test(msg)) {
+    if (/credit[_ ]?balance|billing|insufficient[_ ]?(funds|credit)|purchase[_ ]?credits/i.test(msg)) {
+      publicMsg = 'Analyzer billing issue. Admin: add credits at console.anthropic.com/settings/billing.';
+    } else if (upstreamStatus === 401 || /unauthorized|api[_-]?key/i.test(msg)) {
       publicMsg = 'Receipt analyzer is not configured (ANTHROPIC_API_KEY missing or invalid).';
     } else if (upstreamStatus === 404 || /not[_ ]found|model/i.test(msg)) {
       publicMsg = 'Receipt analyzer model is unavailable. Check CLAUDE_MODEL env var.';
