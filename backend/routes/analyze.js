@@ -76,8 +76,29 @@ router.post('/', rateLimit, async (req, res) => {
   try {
     result = await analyzeImage(imageBase64, mediaType, products, settings);
   } catch (err) {
-    console.error('[analyze] Analysis failed:', err.message);
-    return res.status(502).json({ error: 'Could not analyze receipt. Please try a clearer photo.' });
+    const upstreamStatus = err.status || err.statusCode;
+    console.error('[analyze] Analysis failed:', upstreamStatus || '', err.message);
+
+    // Map known upstream failures to actionable public messages.
+    const msg = String(err.message || '');
+    let publicMsg;
+    if (upstreamStatus === 401 || /unauthorized|api[_-]?key/i.test(msg)) {
+      publicMsg = 'Receipt analyzer is not configured (ANTHROPIC_API_KEY missing or invalid).';
+    } else if (upstreamStatus === 404 || /not[_ ]found|model/i.test(msg)) {
+      publicMsg = 'Receipt analyzer model is unavailable. Check CLAUDE_MODEL env var.';
+    } else if (upstreamStatus === 429 || /rate[_ ]?limit/i.test(msg)) {
+      publicMsg = 'Analyzer is busy. Please try again in a minute.';
+    } else if (upstreamStatus === 400 || /invalid[_ ]request/i.test(msg)) {
+      publicMsg = 'Analyzer rejected the image — try a different format or smaller size.';
+    } else {
+      publicMsg = 'Could not analyze receipt. See detail below.';
+    }
+
+    return res.status(502).json({
+      error: publicMsg,
+      detail: msg,
+      upstreamStatus: upstreamStatus || null,
+    });
   }
 
   const submissionId = uuidv4();

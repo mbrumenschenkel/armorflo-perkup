@@ -811,7 +811,11 @@ async function submitReceipt() {
 
     if (!resp.ok) {
       let msg = `HTTP ${resp.status}`;
-      try { const body = await resp.json(); if (body && body.error) msg = body.error; } catch (_) {}
+      try {
+        const body = await resp.json();
+        if (body && body.error) msg = body.error;
+        if (body && body.detail) msg += ' (' + body.detail + ')';
+      } catch (_) {}
       throw new Error(msg);
     }
     const { result } = await resp.json();
