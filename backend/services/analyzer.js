@@ -82,10 +82,10 @@ Respond ONLY with valid JSON — no markdown, no preamble, nothing else:
 }
 
 /**
- * Main entry point: download image → analyze with Claude → return structured result.
+ * Analyze a base64-encoded image that's already in hand.
+ * Used by the web form (no Twilio download needed).
  */
-async function analyzeReceipt(mediaUrl, products, settings) {
-  const { base64, contentType } = await downloadImage(mediaUrl);
+async function analyzeImage(base64, contentType, products, settings) {
   const prompt = buildPrompt(products, settings);
 
   const response = await client.messages.create({
@@ -115,4 +115,12 @@ async function analyzeReceipt(mediaUrl, products, settings) {
   }
 }
 
-module.exports = { analyzeReceipt };
+/**
+ * SMS entry point: download image from Twilio MMS → analyze.
+ */
+async function analyzeReceipt(mediaUrl, products, settings) {
+  const { base64, contentType } = await downloadImage(mediaUrl);
+  return analyzeImage(base64, contentType, products, settings);
+}
+
+module.exports = { analyzeReceipt, analyzeImage };

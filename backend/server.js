@@ -6,11 +6,13 @@ const fs = require('fs');
 const smsRoutes = require('./routes/sms');
 const adminRoutes = require('./routes/admin');
 const claimRoutes = require('./routes/claim');
+const analyzeRoutes = require('./routes/analyze');
 const requireAdmin = require('./middleware/requireAdmin');
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// Raised limit accommodates base64-encoded receipt images (~6 MB raw -> ~8 MB base64).
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
 // ── CORS (API endpoints only) ────────────────────────────────
 // Only requests whose Origin is in ALLOWED_ORIGINS get CORS
@@ -66,6 +68,7 @@ app.get('/claim', (req, res) => {
 app.use('/sms', smsRoutes);                       // Twilio webhook
 app.use('/api/admin', requireAdmin, adminRoutes); // admin.html REST API
 app.use('/api/claim', claimRoutes);               // customer-facing claim flow
+app.use('/api/analyze', analyzeRoutes);           // web form receipt analysis
 
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'ArmorFlo Perk Up' }));

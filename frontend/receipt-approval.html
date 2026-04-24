@@ -786,49 +786,35 @@ async function submitReceipt() {
   hideError();
   if (!uploadedBase64) { showError('Please upload a receipt image first.'); return; }
   if (!document.getElementById('email').value.trim()) { showError('Please enter your email address.'); return; }
-  const products = await getActiveProducts();
-  if (!products.length) { showError('No active eligible products configured. Please contact support.'); return; }
-  const settings = await getSettings();
   const fname = document.getElementById('fname').value.trim() || 'Customer';
   const email = document.getElementById('email').value.trim();
   const lname = document.getElementById('lname').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const purchaseDate = document.getElementById('purchase-date').value;
 
   ['upload-card','form-card','submit-card'].forEach(id => document.getElementById(id).style.display = 'none');
   document.getElementById('analyzing-card').classList.add('visible');
   startStepAnim();
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch(API_BASE + '/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: uploadedFile.type || 'image/jpeg', data: uploadedBase64 } },
-            { type: 'text', text: buildPrompt(products, settings) }
-          ]
-        }]
-      })
+        imageBase64: uploadedBase64,
+        imageMediaType: (uploadedFile && uploadedFile.type) || 'image/jpeg',
+        fname, lname, email, phone, purchaseDate,
+      }),
     });
     clearInterval(stepTimer);
     ['as1','as2','as3'].forEach(id => document.getElementById(id).className = 'astep done');
-    const data = await resp.json();
-    const raw = data.content?.find(b => b.type === 'text')?.text || '';
-    let result;
-    try { result = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
-    catch { throw new Error('Could not parse AI response. Please try again.'); }
 
-    await saveSubmission({
-      source: 'web',
-      date: new Date().toISOString(),
-      name: fname + (lname ? ' ' + lname : ''),
-      email, approved: result.approved,
-      totalRebate: result.total_rebate || 0,
-      matches: (result.matches || []).map(m => m.matched_product)
-    });
+    if (!resp.ok) {
+      let msg = `HTTP ${resp.status}`;
+      try { const body = await resp.json(); if (body && body.error) msg = body.error; } catch (_) {}
+      throw new Error(msg);
+    }
+    const { result } = await resp.json();
     await new Promise(r => setTimeout(r, 500));
     showResult(result, fname);
   } catch (err) {
