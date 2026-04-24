@@ -364,6 +364,20 @@ textarea { width: 100%; padding: 9px 12px; min-height: 80px; resize: vertical; l
 </style>
 </head>
 <body>
+
+<!-- ── Admin password gate ───────────────────────────────── -->
+<div id="admin-gate" style="position:fixed;inset:0;background:rgba(10,26,46,0.97);z-index:9999;display:none;align-items:center;justify-content:center;padding:2rem;">
+  <form onsubmit="return submitAdminPassword(event)" style="background:#fff;border-radius:12px;padding:2rem;max-width:380px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,0.4);box-sizing:border-box;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:.05em;color:#0a1a2e;margin-bottom:.25rem;">ADMIN ACCESS</div>
+    <p style="color:#666;margin:0 0 1.25rem;font-size:14px;">Enter the admin password to continue.</p>
+    <input id="admin-gate-input" type="password" autocomplete="current-password" autofocus required placeholder="Password"
+           style="width:100%;padding:.7rem .8rem;border:1px solid #ccc;border-radius:6px;font-size:14px;margin-bottom:.75rem;box-sizing:border-box;" />
+    <button type="submit"
+            style="width:100%;padding:.7rem;border:0;border-radius:6px;background:#D68F37;color:#fff;font-weight:700;font-size:14px;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;">Unlock</button>
+    <div id="admin-gate-error" style="display:none;color:#c00;font-size:13px;margin-top:.75rem;text-align:center;"></div>
+  </form>
+</div>
+
 <div class="app">
 
 <!-- SIDEBAR -->
@@ -582,6 +596,58 @@ function getAdminToken() { return localStorage.getItem('armorfloAdminToken') || 
 function setAdminToken(t) {
   if (t) localStorage.setItem('armorfloAdminToken', t);
   else localStorage.removeItem('armorfloAdminToken');
+}
+
+// ── Gate: probe /api/admin/settings. 200 = pass; 401 = need password. ──
+async function unlockAdminThen(onReady) {
+  const cached = getAdminToken();
+  const headers = cached ? { 'X-Admin-Token': cached } : {};
+  let res;
+  try { res = await fetch(API_BASE + '/api/admin/settings', { headers }); }
+  catch (_) { showGate('Cannot reach server. Check network.'); window._pendingOnReady = onReady; return; }
+
+  if (res.status === 200) { onReady(); return; }
+  if (res.status === 401) { setAdminToken(''); showGate(); }
+  else { showGate('Server returned ' + res.status + '. Please retry.'); }
+  window._pendingOnReady = onReady;
+}
+
+function showGate(errMsg) {
+  document.getElementById('admin-gate').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  const errEl = document.getElementById('admin-gate-error');
+  if (errMsg) { errEl.textContent = errMsg; errEl.style.display = 'block'; }
+  else errEl.style.display = 'none';
+  setTimeout(() => { const i = document.getElementById('admin-gate-input'); if (i) i.focus(); }, 50);
+}
+
+async function submitAdminPassword(ev) {
+  ev.preventDefault();
+  const input = document.getElementById('admin-gate-input');
+  const errEl = document.getElementById('admin-gate-error');
+  const pwd = input.value;
+  if (!pwd) return false;
+  errEl.style.display = 'none';
+
+  let res;
+  try { res = await fetch(API_BASE + '/api/admin/settings', { headers: { 'X-Admin-Token': pwd } }); }
+  catch (_) { errEl.textContent = 'Cannot reach server.'; errEl.style.display = 'block'; return false; }
+
+  if (res.status === 200) {
+    setAdminToken(pwd);
+    document.getElementById('admin-gate').style.display = 'none';
+    document.body.style.overflow = '';
+    input.value = '';
+    if (typeof window._pendingOnReady === 'function') { window._pendingOnReady(); window._pendingOnReady = null; }
+  } else if (res.status === 401) {
+    errEl.textContent = 'Incorrect password.';
+    errEl.style.display = 'block';
+    input.select();
+  } else {
+    errEl.textContent = 'Server error ' + res.status + '.';
+    errEl.style.display = 'block';
+  }
+  return false;
 }
 
 async function api(method, path, body) {
@@ -837,7 +903,7 @@ function toast(msg) {
 }
 
 // ── Boot ──
-loadProducts();
+unlockAdminThen(loadProducts);
 </script>
 </body>
 </html>
