@@ -95,6 +95,7 @@ router.post('/incoming', async (req, res) => {
     return twimlReply(res,
       'Welcome to ArmorFlo Perk Up! 🛡️\n\n' +
       'Get cash back on qualifying ArmorFlo purchases. It only takes 60 seconds.\n\n' +
+      'Msg freq varies (up to 6 msgs/submission). Msg & data rates may apply. Reply HELP for help, STOP to cancel.\n\n' +
       'What\'s your first name?'
     );
   }
