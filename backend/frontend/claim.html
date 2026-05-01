@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claim Your Reward — ArmorFlo Perk Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --navy: #0F2C47; --gold: #D68F37; --gold-dark: #b87720; --silver: #999; --grey: #EEEEEE; --white: #fff; --border: rgba(15,44,71,0.10); }
+body { font-family: 'Barlow', sans-serif; background: var(--grey); color: var(--navy); min-height: 100vh; }
+header { background: var(--navy); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.4rem; letter-spacing: 0.04em; color: white; text-decoration: none; text-transform: uppercase; }
+.logo span { color: var(--gold); }
+nav a { font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); text-decoration: none; margin-left: 1.5rem; }
+nav a:hover { color: var(--gold); }
+.hero { background: var(--navy); padding: 2.5rem 2rem; text-align: center; border-bottom: 3px solid var(--gold); }
+.hero-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+.hero h1 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: 0.04em; text-transform: uppercase; color: white; margin-bottom: 6px; }
+.hero-tag { font-size: 13px; color: rgba(255,255,255,0.55); letter-spacing: 0.04em; }
+main { max-width: 680px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+.doc { background: white; border-radius: 10px; overflow: hidden; }
+.section { padding: 2rem 2.5rem; border-bottom: 1px solid var(--grey); }
+.section:last-child { border-bottom: none; }
+.section-num { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+.section h2 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.1rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--navy); margin-bottom: 1rem; }
+p { font-size: 14px; line-height: 1.8; color: #444; margin-bottom: 0.9rem; }
+p:last-child { margin-bottom: 0; }
+.summary-box { background: linear-gradient(180deg, rgba(214,143,55,0.08), rgba(214,143,55,0.02)); border: 1px solid rgba(214,143,55,0.3); border-radius: 8px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+.summary-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding: 0.55rem 0; border-bottom: 1px solid rgba(214,143,55,0.15); }
+.summary-row:last-child { border-bottom: none; }
+.summary-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--silver); flex-shrink: 0; padding-top: 4px; }
+.summary-value { font-size: 14px; color: var(--navy); font-weight: 600; text-align: right; }
+.rebate-amount { font-family: 'Barlow Condensed', sans-serif; font-size: 2.1rem; font-weight: 900; color: var(--gold-dark); line-height: 1; }
+.field { margin-bottom: 1rem; }
+.field label { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--silver); margin-bottom: 6px; }
+.field input { width: 100%; padding: 0.7rem 0.85rem; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; font-family: inherit; color: var(--navy); transition: border-color .15s; }
+.field input:focus { outline: none; border-color: var(--gold); }
+.row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.75rem; }
+@media (max-width: 540px) { .row { grid-template-columns: 1fr; } }
+.btn-primary { background: var(--gold); color: white; border: none; padding: 0.9rem 2rem; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 0.5rem; transition: background .15s; }
+.btn-primary:hover:not(:disabled) { background: var(--gold-dark); }
+.btn-primary:disabled { background: var(--silver); cursor: not-allowed; opacity: 0.7; }
+.error-box { background: rgba(200, 40, 40, 0.08); border-left: 3px solid #c82828; padding: 0.85rem 1.25rem; border-radius: 4px; margin-bottom: 1rem; color: #8B1A1A; font-size: 13px; line-height: 1.6; display: none; }
+.error-box.show { display: block; }
+.center { text-align: center; }
+.success-icon { font-size: 3.5rem; text-align: center; color: var(--gold); margin-bottom: 0.5rem; line-height: 1; }
+.products-list { font-size: 14px; color: var(--navy); font-weight: 600; line-height: 1.5; text-align: right; }
+.loading-state { text-align: center; padding: 3rem 2rem; }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--grey); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-state p { color: var(--silver); }
+a { color: var(--gold-dark); }
+.contact-box { background: var(--navy); border-radius: 8px; padding: 1.25rem 1.5rem; margin-top: 1rem; }
+.contact-box p { color: rgba(255,255,255,0.75); margin-bottom: 0; font-size: 14px; }
+.contact-box a { color: var(--gold); font-weight: 600; }
+footer { background: var(--navy); padding: 1.5rem 2rem; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+footer a { color: rgba(255,255,255,0.3); text-decoration: none; }
+footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="/">ARMOR<span>FLO</span></a>
+  <nav>
+    <a href="/">Submit Receipt</a>
+    <a href="/support">Support</a>
+  </nav>
+</header>
+<div class="hero">
+  <div class="hero-label">Receipt Approved</div>
+  <h1>Claim Your Reward</h1>
+  <div class="hero-tag" id="hero-tag">Confirm your shipping address — your prepaid card is on its way.</div>
+</div>
+<main>
+<div class="doc">
+
+  <!-- Loading -->
+  <div class="section" id="state-loading">
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading your submission…</p>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="section" id="state-error" style="display:none;">
+    <div class="section-num">Unable to Load</div>
+    <h2 id="error-title">Something Went Wrong</h2>
+    <p id="error-message">We couldn't load your submission. Please double-check the link in your text message or email.</p>
+    <div class="contact-box">
+      <p>If the issue continues, contact <a href="mailto:rewards@cadencepetroleum.com">rewards@cadencepetroleum.com</a> with the date and time of your receipt submission.</p>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div id="state-form" style="display:none;">
+    <div class="section">
+      <div class="section-num">Your Reward</div>
+      <h2>Rebate Summary</h2>
+      <div class="summary-box">
+        <div class="summary-row">
+          <span class="summary-label">Approved For</span>
+          <span class="summary-value" id="customer-name">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Qualifying Products</span>
+          <div class="products-list" id="matched-products">—</div>
+        </div>
+        <div class="summary-row" style="align-items:center;padding-top:0.85rem;">
+          <span class="summary-label">Total Rebate</span>
+          <span class="rebate-amount" id="rebate-amount">$0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-num">Step 2 of 2</div>
+      <h2>Shipping Address</h2>
+      <p style="margin-bottom: 1.25rem;">Where should we mail your prepaid rebate card? Please confirm your name and provide a US shipping address.</p>
+
+      <div id="form-error" class="error-box"></div>
+
+      <form id="claim-form" onsubmit="return submitClaim(event)">
+        <div class="field">
+          <label for="claim-name">Full Name</label>
+          <input id="claim-name" type="text" autocomplete="name" required maxlength="100" />
+        </div>
+        <div class="field">
+          <label for="claim-line1">Street Address</label>
+          <input id="claim-line1" type="text" autocomplete="address-line1" required maxlength="200" placeholder="123 Main Street" />
+        </div>
+        <div class="field">
+          <label for="claim-line2">Apt / Suite (optional)</label>
+          <input id="claim-line2" type="text" autocomplete="address-line2" maxlength="100" />
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="claim-city">City</label>
+            <input id="claim-city" type="text" autocomplete="address-level2" required maxlength="100" />
+          </div>
+          <div class="field">
+            <label for="claim-state">State</label>
+            <input id="claim-state" type="text" autocomplete="address-level1" required maxlength="2" placeholder="NC" style="text-transform:uppercase;" />
+          </div>
+          <div class="field">
+            <label for="claim-zip">ZIP</label>
+            <input id="claim-zip" type="text" autocomplete="postal-code" required maxlength="10" placeholder="28202" inputmode="numeric" />
+          </div>
+        </div>
+        <button type="submit" id="submit-btn" class="btn-primary">Submit Claim »</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Success -->
+  <div id="state-success" style="display:none;">
+    <div class="section">
+      <div class="success-icon">✓</div>
+      <h2 class="center" style="color:var(--gold-dark);margin-bottom:0.5rem;">Claim Submitted!</h2>
+      <p class="center" style="margin-bottom: 1.5rem;">Your claim is in. We'll mail your prepaid rebate card to the address below within <strong>6–8 weeks</strong>.</p>
+      <div class="summary-box">
+        <div class="summary-row">
+          <span class="summary-label">Total Rebate</span>
+          <span class="rebate-amount" id="success-rebate">$0.00</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Mailing To</span>
+          <span class="summary-value" id="success-address">—</span>
+        </div>
+      </div>
+      <div class="contact-box">
+        <p>Questions? Email <a href="mailto:rewards@cadencepetroleum.com">rewards@cadencepetroleum.com</a> or visit <a href="/support">Support</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Already claimed -->
+  <div id="state-claimed" style="display:none;">
+    <div class="section">
+      <div class="section-num">Already Claimed</div>
+      <h2>This Reward Has Been Claimed</h2>
+      <p>Our records show this rebate was already claimed on <strong id="claimed-date">—</strong>. Your prepaid card was mailed to the address on file. Please allow up to 8 weeks from the claim date for delivery.</p>
+      <p>Have a different ArmorFlo receipt? <a href="/">Submit another</a>.</p>
+      <div class="contact-box">
+        <p>Questions about a previous claim? Email <a href="mailto:rewards@cadencepetroleum.com">rewards@cadencepetroleum.com</a>.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</main>
+<footer>
+  <div>© 2026 ArmorFlo · Cadence Petroleum Group &nbsp;·&nbsp; <a href="/privacy-policy">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms-and-conditions">Terms &amp; Conditions</a> &nbsp;·&nbsp; <a href="/support">Support</a></div>
+</footer>
+
+<script>
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function getId() {
+  const m = window.location.search.match(/[?&]id=([^&]+)/);
+  return m ? decodeURIComponent(m[1]) : null;
+}
+
+function showState(stateId) {
+  ['loading', 'error', 'form', 'success', 'claimed'].forEach(s => {
+    const el = document.getElementById('state-' + s);
+    if (el) el.style.display = s === stateId ? '' : 'none';
+  });
+}
+
+function showLoadError(title, message) {
+  document.getElementById('error-title').textContent = title;
+  document.getElementById('error-message').textContent = message;
+  showState('error');
+}
+
+function showFormError(msg) {
+  const errEl = document.getElementById('form-error');
+  errEl.textContent = msg;
+  errEl.classList.add('show');
+  errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+let submission = null;
+
+async function loadSubmission() {
+  const id = getId();
+  if (!id) {
+    showLoadError('Missing Link', 'This claim link is missing an ID. Please use the link from your text message or email.');
+    return;
+  }
+
+  let res;
+  try {
+    res = await fetch('/api/claim/' + encodeURIComponent(id));
+  } catch (_) {
+    showLoadError('Network Error', 'We could not reach the server. Check your connection and try refreshing.');
+    return;
+  }
+
+  let data = {};
+  try { data = await res.json(); } catch (_) { /* ignore */ }
+
+  if (res.status === 404) {
+    showLoadError('Submission Not Found', 'We could not find a submission matching this link. Please check the link in your text or email.');
+    return;
+  }
+  if (!res.ok) {
+    showLoadError('Cannot Load Submission', data.error || ('Server returned ' + res.status));
+    return;
+  }
+
+  submission = data.submission;
+
+  if (!submission || !submission.approved) {
+    showLoadError('Not Approved', 'This submission was not approved. If you believe this is in error, please contact rewards@cadencepetroleum.com.');
+    return;
+  }
+
+  if (submission.claimed) {
+    const claimedDate = submission.claimedAt
+      ? new Date(submission.claimedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      : 'a previous date';
+    document.getElementById('claimed-date').textContent = claimedDate;
+    showState('claimed');
+    return;
+  }
+
+  document.getElementById('hero-tag').textContent =
+    `Hello ${submission.name || 'there'} — let's get your card on its way.`;
+  document.getElementById('customer-name').textContent = submission.name || '—';
+  document.getElementById('claim-name').value = submission.name || '';
+
+  const products = (submission.matches || []).filter(Boolean);
+  const productsEl = document.getElementById('matched-products');
+  productsEl.innerHTML = products.length
+    ? products.map(p => esc(p)).join('<br>')
+    : '—';
+
+  document.getElementById('rebate-amount').textContent =
+    '$' + Number(submission.totalRebate || 0).toFixed(2);
+
+  showState('form');
+}
+
+async function submitClaim(ev) {
+  ev.preventDefault();
+  document.getElementById('form-error').classList.remove('show');
+
+  const name  = document.getElementById('claim-name').value.trim();
+  const line1 = document.getElementById('claim-line1').value.trim();
+  const line2 = document.getElementById('claim-line2').value.trim();
+  const city  = document.getElementById('claim-city').value.trim();
+  const state = document.getElementById('claim-state').value.trim().toUpperCase();
+  const zip   = document.getElementById('claim-zip').value.trim();
+
+  if (!name)  { showFormError('Please enter your full name.'); return false; }
+  if (!line1) { showFormError('Please enter your street address.'); return false; }
+  if (!city)  { showFormError('Please enter your city.'); return false; }
+  if (state.length !== 2) { showFormError('State must be a 2-letter abbreviation (e.g., NC).'); return false; }
+  if (!/^\d{5}(-\d{4})?$/.test(zip)) { showFormError('Please enter a valid US ZIP code (e.g., 28202).'); return false; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  try {
+    const id = getId();
+    const body = { name, address: { line1, city, state, zip } };
+    if (line2) body.address.line2 = line2;
+
+    const res = await fetch('/api/claim/' + encodeURIComponent(id), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      showFormError(data.error || ('Server returned ' + res.status));
+      btn.disabled = false;
+      btn.textContent = 'Submit Claim »';
+      return false;
+    }
+
+    document.getElementById('success-rebate').textContent =
+      '$' + Number(submission.totalRebate || 0).toFixed(2);
+    const addrLine = `${line1}${line2 ? ', ' + line2 : ''}, ${city}, ${state} ${zip}`;
+    document.getElementById('success-address').textContent = addrLine;
+    showState('success');
+    window.scrollTo(0, 0);
+  } catch (_) {
+    showFormError('Network error. Please try again.');
+    btn.disabled = false;
+    btn.textContent = 'Submit Claim »';
+  }
+  return false;
+}
+
+loadSubmission();
+</script>
+</body>
+</html>
