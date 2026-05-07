@@ -89,7 +89,7 @@ function buildApprovedEmail(name, matches, totalRebate, claimLink) {
         <!-- Footer -->
         <tr><td style="background:#0F2C47;padding:20px 32px;border-radius:0 0 8px 8px;">
           <p style="font-size:11px;color:rgba(255,255,255,0.3);margin:0;text-align:center;letter-spacing:1px;">
-            © 2026 ArmorFlo · Cadence Petroleum Group · Every Motor. Every Mile.
+            © 2026 ArmorFlo Perk Up · Pugh Lubricants, LLC dba Cadence Petroleum Group · Every Motor. Every Mile.
           </p>
         </td></tr>
 
